@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Executive Suite & User Control</title>
+    <title>Admin Executive & System Control</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -92,75 +92,6 @@
             background: var(--border-hover);
         }
 
-        /* ==========================================================================
-           3. AUTHENTICATION / PASSWORD SCREEN (MODAL OVERLAY)
-           ========================================================================== */
-        .auth-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(4, 4, 7, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 1;
-            visibility: visible;
-            transition: var(--transition-smooth);
-        }
-
-        .auth-overlay.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-
-        .auth-card {
-            width: 100%;
-            max-width: 420px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-xl);
-            padding: 40px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 40px var(--accent-purple-glow);
-            text-align: center;
-            transform: scale(1);
-            transition: var(--transition-bounce);
-            animation: authPulse 6s infinite alternate;
-        }
-
-        @keyframes authPulse {
-            0% { border-color: var(--border-color); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8); }
-            100% { border-color: rgba(139, 92, 246, 0.4); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.9), 0 0 30px var(--accent-purple-glow); }
-        }
-
-        .auth-icon {
-            width: 64px;
-            height: 64px;
-            background: rgba(139, 92, 246, 0.1);
-            border: 1px solid rgba(139, 92, 246, 0.2);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 24px;
-            color: var(--accent-purple);
-        }
-
-        .auth-title {
-            font-size: 24px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            margin-bottom: 8px;
-        }
-
-        .auth-subtitle {
-            font-size: 14px;
-            color: var(--text-muted);
-            margin-bottom: 28px;
-        }
-
         .form-group {
             margin-bottom: 20px;
             text-align: left;
@@ -215,22 +146,8 @@
             transform: translateY(0);
         }
 
-        .auth-error {
-            color: var(--accent-red);
-            font-size: 13px;
-            margin-top: 14px;
-            display: none;
-            animation: shake 0.3s ease-in-out;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-6px); }
-            75% { transform: translateX(6px); }
-        }
-
         /* ==========================================================================
-           4. MAIN ADMIN LAYOUT STRUCTURE
+           3. MAIN ADMIN LAYOUT STRUCTURE
            ========================================================================== */
         .app-container {
             display: flex;
@@ -265,6 +182,14 @@
             font-weight: 800;
             font-size: 18px;
             letter-spacing: -0.5px;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: var(--radius-md);
+            transition: var(--transition-fast);
+        }
+
+        .brand-logo:hover {
+            background: var(--bg-card-hover);
         }
 
         .brand-icon {
@@ -277,38 +202,6 @@
             justify-content: center;
             color: #fff;
             box-shadow: 0 0 15px var(--accent-purple-glow);
-        }
-
-        .sidebar-actions {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .signout-link {
-            color: var(--text-muted);
-            font-size: 13px;
-            font-weight: 600;
-            text-decoration: none;
-            cursor: pointer;
-            transition: var(--transition-fast);
-        }
-
-        .signout-link:hover {
-            color: var(--accent-red);
-        }
-
-        .change-pass-link {
-            color: var(--text-muted);
-            font-size: 13px;
-            font-weight: 600;
-            text-decoration: none;
-            cursor: pointer;
-            transition: var(--transition-fast);
-        }
-
-        .change-pass-link:hover {
-            color: var(--accent-purple);
         }
 
         .account-selector-btn {
@@ -455,7 +348,7 @@
         }
 
         /* ==========================================================================
-           5. DASHBOARD & USER DETAILS COMPONENTS
+           4. DASHBOARD & USER DETAILS COMPONENTS
            ========================================================================== */
         .user-header-bar {
             display: flex;
@@ -685,6 +578,8 @@
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
             overflow: hidden;
+            max-height: 300px;
+            overflow-y: auto;
         }
 
         .history-row {
@@ -758,7 +653,7 @@
         }
 
         /* ==========================================================================
-           6. MODAL SYSTEM DIALOGS
+           5. MODAL SYSTEM DIALOGS
            ========================================================================== */
         .modal-overlay {
             position: fixed;
@@ -781,7 +676,7 @@
 
         .modal-body {
             width: 100%;
-            max-width: 480px;
+            max-width: 580px;
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-xl);
@@ -823,7 +718,7 @@
         }
 
         /* ==========================================================================
-           7. TOAST NOTIFICATION SYSTEM
+           6. TOAST NOTIFICATION SYSTEM
            ========================================================================== */
         .toast-container {
             position: fixed;
@@ -859,39 +754,13 @@
 </head>
 <body>
 
-    <!-- AUTHENTICATION OVERLAY -->
-    <div class="auth-overlay" id="authOverlay">
-        <div class="auth-card">
-            <div class="auth-icon">
-                <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m0 0v2m0-2h2m-2 0H10m8-6V7a4 4 0 00-8 0v4M5 11h14a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2v-7a2 2 0 012-2z"/>
-                </svg>
-            </div>
-            <h2 class="auth-title">Admin Access</h2>
-            <p class="auth-subtitle">Enter security password to access control panel</p>
-            
-            <form id="authForm" onsubmit="handleLogin(event)">
-                <div class="form-group">
-                    <label class="form-label">Admin Password</label>
-                    <input type="password" id="adminPasswordInput" class="input-field" placeholder="••••••••" required autofocus>
-                </div>
-                <button type="submit" class="btn-primary">Unlock Panel</button>
-                <div class="auth-error" id="authError">Incorrect password. Please try again.</div>
-            </form>
-        </div>
-    </div>
-
     <!-- MAIN APPLICATION LAYOUT -->
     <div class="app-container">
         <aside class="sidebar">
             <div class="sidebar-brand">
-                <div class="brand-logo">
+                <div class="brand-logo" onclick="openAdminProfileModal()" title="Відкрити Admin Профіль та Логи">
                     <div class="brand-icon">⚡</div>
-                    <span>Admin Suite</span>
-                </div>
-                <div class="sidebar-actions">
-                    <a class="change-pass-link" onclick="openModal('changeAdminPassModal')" title="Change Password">🔑 Pass</a>
-                    <a class="signout-link" onclick="logoutAdmin()">Sign out</a>
+                    <span>Admin</span>
                 </div>
             </div>
 
@@ -921,6 +790,29 @@
     </div>
 
     <!-- MODALS -->
+    
+    <!-- Modal: Admin Profile & System Movement Logs -->
+    <div class="modal-overlay" id="adminProfileModal">
+        <div class="modal-body">
+            <div class="modal-header">
+                <h3 class="modal-title">⚡ Admin Profile & System Audit Log</h3>
+                <button class="modal-close-btn" onclick="closeModal('adminProfileModal')">✕</button>
+            </div>
+
+            <div class="history-section">
+                <div class="section-header-title">ALL MOVEMENTS & SYSTEM LOGS (ГОЛОВНИЙ ЛОГ)</div>
+                <div class="history-table-container" id="adminAuditLogContainer" style="max-height: 250px;">
+                    <!-- Logs dynamically rendered here -->
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-action btn-action-outline" onclick="closeModal('adminProfileModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Alert Dialog -->
     <div class="modal-overlay" id="customAlertModal">
         <div class="modal-body" style="text-align: center; max-width: 420px;">
             <div class="modal-header" style="justify-content: center; margin-bottom: 12px;">
@@ -929,28 +821,6 @@
             <p id="customModalText" style="color: var(--text-muted); font-size: 14px; margin-bottom: 24px; line-height: 1.5;"></p>
             <div class="modal-actions" id="customModalActions" style="justify-content: center;">
                 <button class="btn-action btn-action-purple" onclick="closeModal('customAlertModal')">Зрозуміло</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal: Change Admin Password -->
-    <div class="modal-overlay" id="changeAdminPassModal">
-        <div class="modal-body">
-            <div class="modal-header">
-                <h3 class="modal-title">Change Admin Password</h3>
-                <button class="modal-close-btn" onclick="closeModal('changeAdminPassModal')">✕</button>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Current Password</label>
-                <input type="password" id="currentAdminPassInput" class="input-field" placeholder="••••••••">
-            </div>
-            <div class="form-group">
-                <label class="form-label">New Password</label>
-                <input type="password" id="newAdminPassInput" class="input-field" placeholder="••••••••">
-            </div>
-            <div class="modal-actions">
-                <button class="btn-action btn-action-outline" onclick="closeModal('changeAdminPassModal')">Cancel</button>
-                <button class="btn-action btn-action-purple" onclick="submitChangeAdminPassword()">Save Password</button>
             </div>
         </div>
     </div>
@@ -1024,16 +894,7 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
-        let isAuthenticated = false;
         let selectedUserId = null;
-
-        function getAdminPassword() {
-            return localStorage.getItem("admin_password") || "admin123";
-        }
-
-        function setAdminPassword(newPass) {
-            localStorage.setItem("admin_password", newPass);
-        }
 
         const DEFAULT_USERS = [
             { id: 1, name: "PveUzar", balance: 0.00, totalEarned: 0.00, rate: 0.00, created: "25/07/2026 14:20", history: [] },
@@ -1054,13 +915,9 @@
         ];
 
         let users = [];
+        let systemLogs = [];
 
         function initApp() {
-            if (sessionStorage.getItem("admin_authenticated") === "true") {
-                isAuthenticated = true;
-                document.getElementById("authOverlay").classList.add("hidden");
-            }
-
             const storedData = localStorage.getItem("admin_users_db");
             if (storedData) {
                 try {
@@ -1073,12 +930,61 @@
                 saveData();
             }
 
+            const storedLogs = localStorage.getItem("admin_system_logs");
+            if (storedLogs) {
+                try {
+                    systemLogs = JSON.parse(storedLogs);
+                } catch (e) { systemLogs = []; }
+            }
+
             renderSidebar();
             startAccrualEngine();
         }
 
         function saveData() {
             localStorage.setItem("admin_users_db", JSON.stringify(users));
+            localStorage.setItem("admin_system_logs", JSON.stringify(systemLogs));
+        }
+
+        // Add to Global Audit Log & User Log
+        function recordMovement(userName, actionTitle, amount = null) {
+            const dateStr = new Date().toLocaleString('en-GB');
+            const logEntry = {
+                user: userName,
+                action: actionTitle,
+                date: dateStr,
+                amount: amount
+            };
+
+            systemLogs.unshift(logEntry);
+            
+            // Add to User's internal history as well
+            const targetUser = users.find(u => u.name === userName);
+            if (targetUser && amount !== null) {
+                targetUser.history.unshift({
+                    type: actionTitle,
+                    date: dateStr,
+                    amount: amount
+                });
+            } else if (targetUser) {
+                targetUser.history.unshift({
+                    type: actionTitle,
+                    date: dateStr,
+                    amount: 0
+                });
+            }
+
+            saveData();
+            showToast(`Лог: ${userName} — ${actionTitle}`);
+        }
+
+        // Simulate Player Account Login Event
+        function simulatePlayerLogin(userId) {
+            const user = users.find(u => u.id === userId);
+            if (user) {
+                recordMovement(user.name, "Гравець увійшов на аккаунт", null);
+                renderWorkspace();
+            }
         }
 
         let lastAccrualTick = Date.now();
@@ -1107,49 +1013,29 @@
             }, 100);
         }
 
-        function handleLogin(e) {
-            e.preventDefault();
-            const passwordInput = document.getElementById("adminPasswordInput").value;
-            const errorElement = document.getElementById("authError");
-
-            if (passwordInput === getAdminPassword()) {
-                isAuthenticated = true;
-                sessionStorage.setItem("admin_authenticated", "true");
-                document.getElementById("authOverlay").classList.add("hidden");
-                showToast("Welcome back, Administrator");
-            } else {
-                errorElement.style.display = "block";
-                setTimeout(() => {
-                    errorElement.style.display = "none";
-                }, 3000);
-            }
+        function openAdminProfileModal() {
+            renderAdminAuditLogs();
+            openModal('adminProfileModal');
         }
 
-        function submitChangeAdminPassword() {
-            const currentPass = document.getElementById("currentAdminPassInput").value;
-            const newPass = document.getElementById("newAdminPassInput").value;
-
-            if (currentPass !== getAdminPassword()) {
-                showCustomAlert("Помилка", "Невірний поточний пароль");
-                return;
-            }
-            if (!newPass || newPass.length < 4) {
-                showCustomAlert("Помилка", "Пароль повинен містити щонайменше 4 символи");
+        function renderAdminAuditLogs() {
+            const container = document.getElementById("adminAuditLogContainer");
+            if (systemLogs.length === 0) {
+                container.innerHTML = `<div class="history-row"><div class="history-title" style="color:var(--text-muted)">Логи руху відсутні</div></div>`;
                 return;
             }
 
-            setAdminPassword(newPass);
-            closeModal("changeAdminPassModal");
-            document.getElementById("currentAdminPassInput").value = "";
-            document.getElementById("newAdminPassInput").value = "";
-            showToast("Admin password updated successfully");
-        }
-
-        function logoutAdmin() {
-            sessionStorage.removeItem("admin_authenticated");
-            isAuthenticated = false;
-            document.getElementById("authOverlay").classList.remove("hidden");
-            showToast("Signed out successfully");
+            container.innerHTML = systemLogs.map(log => `
+                <div class="history-row">
+                    <div class="history-info">
+                        <div class="history-title"><strong>[${log.user}]</strong> ${log.action}</div>
+                        <div class="history-date">${log.date}</div>
+                    </div>
+                    <div class="history-amount ${log.amount > 0 ? 'amount-positive' : log.amount < 0 ? 'amount-negative' : ''}">
+                        ${log.amount ? (log.amount >= 0 ? '+' : '') + formatMoney(log.amount) : ''}
+                    </div>
+                </div>
+            `).join('');
         }
 
         function formatMoney(val) {
@@ -1236,25 +1122,26 @@
                 </div>
 
                 <div class="action-card">
-                    <div class="metric-label">BALANCE MANAGEMENT</div>
+                    <div class="metric-label">ACTIONS & SIMULATIONS</div>
                     <div class="action-buttons-group">
                         <button class="btn-action btn-action-purple" onclick="openModal('balanceModal')">Update balance</button>
+                        <button class="btn-action btn-action-outline" onclick="simulatePlayerLogin(${user.id})">🔑 Симулювати вхід гравця</button>
                         <button class="btn-action btn-action-danger" onclick="resetUserBalance(${user.id})">Reset balance</button>
                     </div>
                 </div>
 
                 <div class="history-section">
-                    <div class="section-header-title">TRANSACTION HISTORY</div>
+                    <div class="section-header-title">TRANSACTION & ACCOUNT HISTORY</div>
                     <div class="history-table-container">
-                        ${user.history.length === 0 ? '<div class="history-row"><div class="history-title" style="color:var(--text-muted)">No transactions recorded</div></div>' : ''}
+                        ${user.history.length === 0 ? '<div class="history-row"><div class="history-title" style="color:var(--text-muted)">No history recorded</div></div>' : ''}
                         ${user.history.map(item => `
                             <div class="history-row">
                                 <div class="history-info">
                                     <div class="history-title">${item.type}</div>
                                     <div class="history-date">${item.date}</div>
                                 </div>
-                                <div class="history-amount ${item.amount >= 0 ? 'amount-positive' : 'amount-negative'}">
-                                    ${item.amount >= 0 ? '+' : ''}${formatMoney(item.amount)}
+                                <div class="history-amount ${item.amount > 0 ? 'amount-positive' : item.amount < 0 ? 'amount-negative' : ''}">
+                                    ${item.amount ? (item.amount >= 0 ? '+' : '') + formatMoney(item.amount) : ''}
                                 </div>
                             </div>
                         `).join('')}
@@ -1324,7 +1211,7 @@
 
         function submitBalanceUpdate() {
             const amount = parseFloat(document.getElementById("balanceAmountInput").value);
-            const note = document.getElementById("balanceNoteInput").value || "Admin Adjustment";
+            const note = document.getElementById("balanceNoteInput").value || (amount >= 0 ? "Admin Deposit" : "Admin Withdrawal");
 
             if (isNaN(amount)) {
                 showCustomAlert("Помилка", "Будь ласка, введіть коректну числову суму");
@@ -1336,17 +1223,12 @@
                 user.balance += amount;
                 if (amount > 0) user.totalEarned += amount;
 
-                user.history.unshift({
-                    type: note,
-                    date: new Date().toLocaleString('en-GB'),
-                    amount: amount
-                });
+                // Record globally and locally
+                recordMovement(user.name, `Зміна балансу адміном: ${note}`, amount);
 
-                saveData();
                 renderSidebar();
                 renderWorkspace();
                 closeModal("balanceModal");
-                showToast("Balance updated successfully");
             }
         }
 
@@ -1361,10 +1243,9 @@
             const user = users.find(u => u.id === selectedUserId);
             if (user) {
                 user.rate = newRate;
-                saveData();
+                recordMovement(user.name, `Зміна ставки адміном на $${formatMoney(newRate)}/год`, null);
                 renderWorkspace();
                 closeModal("rateModal");
-                showToast("Hourly rate updated");
             }
         }
 
@@ -1372,28 +1253,26 @@
             showCustomConfirm("Скидання балансу", "Ви впевнені, що хочете скинути баланс цього користувача до 0?", () => {
                 const user = users.find(u => u.id === id);
                 if (user) {
-                    user.history.unshift({
-                        type: "Balance reset by admin (payout)",
-                        date: new Date().toLocaleString('en-GB'),
-                        amount: -user.balance
-                    });
+                    const oldBal = user.balance;
                     user.balance = 0;
-                    saveData();
+                    recordMovement(user.name, "Скидання балансу адміном", -oldBal);
                     renderSidebar();
                     renderWorkspace();
-                    showToast("User balance reset to 0");
                 }
             });
         }
 
         function deleteUserAccount(id) {
             showCustomConfirm("Видалення акаунту", "УВАГА: Це незворотна дія. Видалити акаунт та весь його баланс?", () => {
+                const user = users.find(u => u.id === id);
+                if (user) {
+                    recordMovement(user.name, "Акаунт видалено адміном", null);
+                }
                 users = users.filter(u => u.id !== id);
                 selectedUserId = null;
                 saveData();
                 renderSidebar();
                 renderWorkspace();
-                showToast("Account deleted");
             });
         }
 
@@ -1418,14 +1297,13 @@
                 totalEarned: initBal,
                 rate: initRate,
                 created: new Date().toLocaleString('en-GB'),
-                history: initBal > 0 ? [{ type: "Initial Balance", date: new Date().toLocaleString('en-GB'), amount: initBal }] : []
+                history: []
             };
 
             users.push(newUser);
-            saveData();
+            recordMovement(name, "Створено новий акаунт", initBal > 0 ? initBal : null);
             selectUser(newUser.id);
             closeModal("newUserModal");
-            showToast(`User ${name} created successfully`);
         }
 
         function showToast(msg) {
