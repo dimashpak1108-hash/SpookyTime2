@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark-blue">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payroll — User Portal Pro</title>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+  /* ==========================================
+     1. COLOR THEMES DEFINITIONS
+     ========================================== */
+  
+  /* Theme 1: Dark Blue (Default Neon) */
+  [data-theme="dark-blue"] {
+    --bg-main: #0a0c10;
+    --bg-card: #12161f;
+    --bg-card-hover: #181d29;
+    --bg-input: #0a0d14;
+    --border-color: #202736;
+    --border-focus: #3b82f6;
+    
+    --text-primary: #f3f4f6;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+    
+    --accent-primary: #3b82f6;
+    --accent-glow: rgba(59, 130, 246, 0.18);
+    --positive-green: #10b981;
+    --positive-glow: rgba(16, 185, 129, 0.18);
+    --danger-red: #ef4444;
+    --danger-glow: rgba(239, 68, 68, 0.18);
+    --warning-yellow: #f59e0b;
+  }
+
+  /* Theme 2: Emerald Green Cyber */
+  [data-theme="emerald"] {
+    --bg-main: #06140e;
+    --bg-card: #0d2118;
+    --bg-card-hover: #122b20;
+    --bg-input: #040e0a;
+    --border-color: #17382a;
+    --border-focus: #10b981;
+    
+    --text-primary: #ecfdf5;
+    --text-secondary: #a7f3d0;
+    --text-muted: #059669;
+    
+    --accent-primary: #10b981;
+    --accent-glow: rgba(16, 185, 129, 0.22);
+    --positive-green: #34d399;
+    --positive-glow: rgba(52, 211, 153, 0.22);
+    --danger-red: #f87171;
+    --danger-glow: rgba(248, 113, 113, 0.22);
+    --warning-yellow: #fbbf24;
+  }
+
+  /* Theme 3: Cyberpunk Violet / Purple */
+  [data-theme="purple"] {
+    --bg-main: #0d0a1a;
+    --bg-card: #16112a;
+    --bg-card-hover: #1f183b;
+    --bg-input: #090712;
+    --border-color: #2a204d;
+    --border-focus: #8b5cf6;
+    
+    --text-primary: #f5f3ff;
+    --text-secondary: #ddd6fe;
+    --text-muted: #8b5cf6;
+    
+    --accent-primary: #8b5cf6;
+    --accent-glow: rgba(139, 92, 246, 0.25);
+    --positive-green: #10b981;
+    --positive-glow: rgba(16, 185, 129, 0.22);
+    --danger-red: #ec4899;
+    --danger-glow: rgba(236, 72, 153, 0.22);
+    --warning-yellow: #f59e0b;
+  }
+
+  /* Theme 4: Sunset Crimson Amber */
+  [data-theme="amber"] {
+    --bg-main: #140d0a;
+    --bg-card: #211612;
+    --bg-card-hover: #2b1d18;
+    --bg-input: #0d0806;
+    --border-color: #3b251e;
+    --border-focus: #f97316;
+    
+    --text-primary: #fff7ed;
+    --text-secondary: #ffedd5;
+    --text-muted: #c2410c;
+    
+    --accent-primary: #f97316;
+    --accent-glow: rgba(249, 115, 22, 0.22);
+    --positive-green: #10b981;
+    --positive-glow: rgba(16, 185, 129, 0.2);
+    --danger-red: #ef4444;
+    --danger-glow: rgba(239, 68, 68, 0.2);
+    --warning-yellow: #fbbf24;
+  }
+
+  /* Theme 5: Light Pro Slate */
+  [data-theme="light"] {
+    --bg-main: #f1f5f9;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f8fafc;
+    --bg-input: #f8fafc;
+    --border-color: #cbd5e1;
+    --border-focus: #2563eb;
+    
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    
+    --accent-primary: #2563eb;
+    --accent-glow: rgba(37, 99, 235, 0.15);
+    --positive-green: #059669;
+    --positive-glow: rgba(5, 150, 105, 0.15);
+    --danger-red: #dc2626;
+    --danger-glow: rgba(220, 38, 38, 0.15);
+    --warning-yellow: #d97706;
+  }
+
+  /* ==========================================
+     2. GLOBAL CORE STYLES
+     ========================================== */
+  :root {
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --radius-full: 9999px;
+    
+    --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+    --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: var(--font-family);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 24px 12px;
+    line-height: 1.5;
+    transition: background-color var(--transition-smooth), color var(--transition-smooth);
+  }
+
+  .app-container {
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .hidden {
+    display: none !important;
+  }
+
+  .screen {
+    animation: slideUpFade 0.4s var(--transition-smooth) forwards;
+  }
+
+  @keyframes slideUpFade {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    margin-bottom: 16px;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4);
+    transition: transform var(--transition-fast), border-color var(--transition-fast), background-color var(--transition-smooth);
+  }
+
+  .card-clickable {
+    cursor: pointer;
+  }
+  .card-clickable:hover {
+    border-color: var(--border-focus);
+    transform: translateY(-2px);
+  }
+
+  .label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+
+  .input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background: var(--bg-input);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 15px;
+    outline: none;
+    transition: all var(--transition-fast);
+  }
+
+  .input:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 4px var(--accent-glow);
+  }
+
+  .input-error {
+    border-color: var(--danger-red) !important;
+    animation: shake 0.4s ease;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 20px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .btn:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--border-focus);
+  }
+
+  .btn:active {
+    transform: scale(0.98);
+  }
+
+  .btn-primary {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: #ffffff;
+  }
+
+  .btn-primary:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 4px 20px var(--accent-glow);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    border-color: var(--border-color);
+    color: var(--text-primary);
+  }
+
+  .btn-link {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 13px;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .btn-link:hover {
+    color: var(--text-secondary);
+    text-decoration: underline;
+  }
+
+  .error-msg {
+    color: var(--danger-red);
+    font-size: 13px;
+    margin-top: 8px;
+    min-height: 20px;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .user-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    border-radius: var(--radius-full);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .user-chip:hover {
+    border-color: var(--accent-primary);
+    background: var(--bg-card-hover);
+    box-shadow: 0 0 15px var(--accent-glow);
+  }
+
+  .user-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--accent-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #fff;
+    font-weight: 700;
+  }
+
+  .balance-wrap {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin: 8px 0;
+  }
+
+  .balance {
+    font-size: 38px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+
+  .live-badge {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--positive-green);
+    background: var(--positive-glow);
+    border: 1px solid var(--positive-green);
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .live-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--positive-green);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--positive-green);
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.85); }
+  }
+
+  .rate-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--positive-glow);
+    border: 1px solid var(--positive-green);
+  }
+
+  .rate-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--positive-green);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .timeframe-bar {
+    display: flex;
+    background: var(--bg-input);
+    padding: 4px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    gap: 4px;
+    margin-bottom: 16px;
+  }
+
+  .tf-btn {
+    flex: 1;
+    padding: 6px 0;
+    font-size: 12px;
+    font-weight: 600;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .tf-btn.active {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+
+  .chart-container {
+    position: relative;
+    height: 220px;
+    width: 100%;
+  }
+
+  .tx-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .tx-row:last-child {
+    border-bottom: none;
+  }
+
+  .tx-amount {
+    font-weight: 700;
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tx-amount.positive { color: var(--positive-green); }
+  .tx-amount.negative { color: var(--danger-red); }
+
+  .tx-date {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .stat-card {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 14px;
+  }
+
+  .stat-val {
+    font-size: 18px;
+    font-weight: 700;
+    margin-top: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Theme Switcher Options in Profile */
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-top: 8px;
+    margin-bottom: 16px;
+  }
+
+  .theme-option {
+    height: 38px;
+    border-radius: var(--radius-md);
+    border: 2px solid transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+  }
+
+  .theme-option.active {
+    border-color: var(--text-primary) !important;
+    transform: scale(1.08);
+  }
+
+  .theme-opt-dark-blue { background: #3b82f6; border-color: #1d4ed8; }
+  .theme-opt-emerald { background: #10b981; border-color: #047857; }
+  .theme-opt-purple { background: #8b5cf6; border-color: #6d28d9; }
+  .theme-opt-amber { background: #f97316; border-color: #c2410c; }
+  .theme-opt-light { background: #e2e8f0; border-color: #94a3b8; }
+
+  /* ==========================================
+     3. MODALS & IN-APP CUSTOM NOTIFICATIONS
+     ========================================== */
+  .modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s var(--transition-smooth);
+  }
+
+  .modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .modal-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 440px;
+    padding: 26px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    transform: scale(0.92);
+    transition: transform 0.25s var(--transition-smooth);
+  }
+
+  .modal-overlay.active .modal-card {
+    transform: scale(1);
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .modal-title {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .close-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 22px;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .close-btn:hover { color: var(--text-primary); }
+
+  /* In-App Custom Modal Alert Window */
+  .custom-alert-card {
+    text-align: center;
+    max-width: 380px;
+  }
+
+  .alert-icon-box {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 28px;
+  }
+
+  .alert-icon-success {
+    background: var(--positive-glow);
+    color: var(--positive-green);
+    border: 2px solid var(--positive-green);
+  }
+
+  .alert-icon-error {
+    background: var(--danger-glow);
+    color: var(--danger-red);
+    border: 2px solid var(--danger-red);
+  }
+
+  .alert-icon-info {
+    background: var(--accent-glow);
+    color: var(--accent-primary);
+    border: 2px solid var(--accent-primary);
+  }
+
+  /* In-App Toast System */
+  #toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 320px;
+    width: calc(100% - 48px);
+    pointer-events: none;
+  }
+
+  .toast-item {
+    pointer-events: auto;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--accent-primary);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: toastIn 0.3s var(--transition-smooth) forwards;
+  }
+
+  .toast-item.toast-success { border-left-color: var(--positive-green); }
+  .toast-item.toast-error { border-left-color: var(--danger-red); }
+
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .offline-banner {
+    background: var(--danger-red);
+    color: #ffffff;
+    text-align: center;
+    padding: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 2000;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="offline-banner" id="offline-banner">Connection lost. Data may be outdated.</div>
+
+<!-- Toast Container for Notifications -->
+<div id="toast-container"></div>
+
+<!-- CUSTOM IN-APP ALERT MODAL DIALOG -->
+<div class="modal-overlay" id="alert-modal">
+  <div class="modal-card custom-alert-card">
+    <div class="alert-icon-box" id="alert-icon-box">✓</div>
+    <div class="modal-title" id="alert-title" style="margin-bottom:8px;">Notification</div>
+    <div style="font-size:14px; color:var(--text-secondary); margin-bottom:20px;" id="alert-message">Message</div>
+    <button class="btn btn-primary" style="width:100%;" onclick="closeCustomAlert()">Got it</button>
+  </div>
+</div>
+
+<div class="app-container">
+
+  <!-- SCREEN 1: LOGIN USERNAME -->
+  <div id="login-screen" class="screen">
+    <div style="text-align:center; padding: 48px 0 32px;">
+      <div style="font-size:28px; font-weight:800; letter-spacing:-0.03em; margin-bottom:8px;">Payroll User Portal</div>
+      <div class="label" style="text-transform:none; font-size:14px;">Enter your username to access your portal</div>
+    </div>
+    <div class="card">
+      <div class="label">Username</div>
+      <input id="login-username" class="input" placeholder="e.g. alex_dev" autocomplete="off">
+      <div class="error-msg" id="login-error"></div>
+      <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="onUsernameSubmit()">Continue</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: PASSWORD LOGIN / REGISTER -->
+  <div id="password-screen" class="screen hidden">
+    <div style="text-align:center; padding: 36px 0 24px;">
+      <div style="font-size:24px; font-weight:700; margin-bottom:6px;" id="password-title">Authorization</div>
+      <div class="label" style="text-transform:none; font-size:14px;" id="password-subtitle">Enter your password</div>
+    </div>
+    <div class="card">
+      <!-- Existing User Form -->
+      <div id="existing-user-form">
+        <div class="label">Password</div>
+        <input id="existing-password" type="password" class="input" placeholder="••••••••" autocomplete="off">
+        <div class="error-msg" id="existing-error"></div>
+        <button class="btn btn-primary" style="width:100%; margin-top:12px;" onclick="onExistingLogin()">Log In</button>
+      </div>
+
+      <!-- New User Registration Form -->
+      <div id="new-user-form" class="hidden">
+        <div class="label">Create a password</div>
+        <input id="new-password" type="password" class="input" placeholder="Minimum 4 characters" autocomplete="off">
+        <div style="margin-top:12px;"></div>
+        <div class="label">Confirm password</div>
+        <input id="new-password-confirm" type="password" class="input" placeholder="Repeat password" autocomplete="off">
+        <div class="error-msg" id="new-error"></div>
+        <button class="btn btn-primary" style="width:100%; margin-top:12px;" onclick="onCreateAccount()">Create Account</button>
+      </div>
+
+      <div style="text-align:center; margin-top:16px;">
+        <button class="btn-link" onclick="backToLogin()">Change username</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: MAIN DASHBOARD -->
+  <div id="main-screen" class="screen hidden">
+    <!-- Top Navigation Header -->
+    <div class="header">
+      <div class="user-chip" id="user-chip" onclick="openProfileModal()">
+        <div class="user-avatar" id="avatar-initial">U</div>
+        <span id="user-name">User</span>
+      </div>
+      <button class="btn btn-secondary" style="padding: 8px 14px; font-size:13px;" onclick="doLogout()">Log Out</button>
+    </div>
+
+    <!-- Current Balance Card -->
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="label">Current Balance</div>
+        <span class="live-badge hidden" id="live-badge"><span class="live-dot"></span>Live</span>
+      </div>
+      <div class="balance-wrap">
+        <div class="balance" id="balance">0.00</div>
+      </div>
+    </div>
+
+    <!-- Hourly Rate Card -->
+    <div class="card rate-box">
+      <div>
+        <div class="label" style="margin-bottom:2px; color:var(--text-muted);">Hourly Rate</div>
+        <div class="rate-value" id="hourly-rate">0.00 / hr</div>
+      </div>
+      <div style="font-size:13px; font-weight:600; color:var(--text-muted);" id="rate-status">Inactive</div>
+    </div>
+
+    <!-- Balance Chart Card -->
+    <div class="card">
+      <div class="label" style="margin-bottom:12px;">Balance Dynamics</div>
+      
+      <!-- Timeframe Selector -->
+      <div class="timeframe-bar">
+        <button class="tf-btn active" onclick="setTimeframe('1m', this)">1m</button>
+        <button class="tf-btn" onclick="setTimeframe('1h', this)">1h</button>
+        <button class="tf-btn" onclick="setTimeframe('1d', this)">1d</button>
+        <button class="tf-btn" onclick="setTimeframe('all', this)">All time</button>
+      </div>
+
+      <div class="chart-container">
+        <canvas id="balanceChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Lifetime Statistics Grid -->
+    <div class="card">
+      <div class="label" style="margin-bottom:14px;">Account Statistics</div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="label" style="font-size:11px;">Total Earned</div>
+          <div class="stat-val" id="lifetime-earned" style="color:var(--positive-green);">0.00</div>
+        </div>
+        <div class="stat-card">
+          <div class="label" style="font-size:11px;">Speed / min</div>
+          <div class="stat-val" id="minutely-rate">0.00</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transactions List -->
+    <div>
+      <div class="label" style="margin-left:4px; margin-bottom:10px;">Transaction History</div>
+      <div class="card" id="tx-list" style="padding: 10px 20px;">
+        <div style="text-align:center; padding: 24px; color: var(--text-muted); font-size:14px;">No transactions yet</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- USER PROFILE & SETTINGS MODAL -->
+<div class="modal-overlay" id="profile-modal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title">User Profile</div>
+      <button class="close-btn" onclick="closeProfileModal()">&times;</button>
+    </div>
+
+    <div style="text-align:center; margin-bottom: 20px;">
+      <div class="user-avatar" id="modal-avatar" style="width:54px; height:54px; font-size:22px; margin: 0 auto 10px;">U</div>
+      <div style="font-size:20px; font-weight:700;" id="modal-username">User</div>
+      <div style="font-size:13px; color: var(--text-muted);" id="modal-created-at">Account created: -</div>
+    </div>
+
+    <!-- Theme Switcher -->
+    <div style="margin-bottom: 16px;">
+      <div class="label">App Theme</div>
+      <div class="theme-grid">
+        <div class="theme-option theme-opt-dark-blue active" onclick="setAppTheme('dark-blue', this)" title="Dark Blue"></div>
+        <div class="theme-option theme-opt-emerald" onclick="setAppTheme('emerald', this)" title="Emerald"></div>
+        <div class="theme-option theme-opt-purple" onclick="setAppTheme('purple', this)" title="Cyberpunk"></div>
+        <div class="theme-option theme-opt-amber" onclick="setAppTheme('amber', this)" title="Amber"></div>
+        <div class="theme-option theme-opt-light" onclick="setAppTheme('light', this)" title="Light"></div>
+      </div>
+    </div>
+
+    <div class="card" style="padding: 14px; margin-bottom: 16px; background: var(--bg-input);">
+      <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+        <span style="font-size:13px; color:var(--text-muted);">Account status:</span>
+        <span style="font-size:13px; font-weight:600; color:var(--positive-green);">Active</span>
+      </div>
+      <div style="display:flex; justify-content:space-between;">
+        <span style="font-size:13px; color:var(--text-muted);">Total transactions:</span>
+        <span style="font-size:13px; font-weight:600;" id="modal-tx-count">0</span>
+      </div>
+    </div>
+
+    <!-- Change Password Section -->
+    <div style="border-top: 1px solid var(--border-color); padding-top: 16px;">
+      <div class="label">Change Password</div>
+      <input id="pwd-old" type="password" class="input" placeholder="Current password" style="margin-bottom:8px;">
+      <input id="pwd-new" type="password" class="input" placeholder="New password">
+      <div class="error-msg" id="pwd-modal-error"></div>
+      <button class="btn btn-primary" style="width:100%; margin-top:8px;" onclick="onChangePassword()">Update Password</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Mandatory Firebase Config
+const firebaseConfig = {
+    apiKey: "AIzaSyDHtCHRG9o1Alpa8qDgezcakfNdQogs-_w",
+    authDomain: "spookytime-a7302.firebaseapp.com",
+    databaseURL: "https://spookytime-a7302-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "spookytime-a7302",
+    storageBucket: "spookytime-a7302.firebasestorage.app",
+    messagingSenderId: "196885981587",
+    appId: "1:196885981587:web:4ebf769c820a740cb32066",
+    measurementId: "G-SYZJ94852S"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// Network status tracking
+window.addEventListener('online', () => document.getElementById('offline-banner').style.display = 'none');
+window.addEventListener('offline', () => document.getElementById('offline-banner').style.display = 'block');
+
+// State Constants
+const LS_SESSION_USER = 'payroll_user_session';
+const LS_SESSION_TIME = 'payroll_user_session_time';
+const LS_THEME_KEY = 'payroll_app_theme';
+const SESSION_MS = 24 * 60 * 60 * 1000;
+
+let currentUser = null;
+let pendingUsername = null;
+let userListener = null;
+let currentData = null;
+let timerInterval = null;
+let chartInstance = null;
+let currentTimeframe = '1m';
+let alertCallback = null;
+
+/* ==========================================
+   IN-APP CUSTOM MODALS & NOTIFICATION SYSTEM
+   ========================================== */
+
+function showCustomAlert(title, message, type = 'success', callback = null) {
+  const modal = document.getElementById('alert-modal');
+  const iconBox = document.getElementById('alert-icon-box');
+  document.getElementById('alert-title').textContent = title;
+  document.getElementById('alert-message').textContent = message;
+  
+  alertCallback = callback;
+
+  iconBox.className = 'alert-icon-box';
+  if (type === 'success') {
+    iconBox.classList.add('alert-icon-success');
+    iconBox.textContent = '✓';
+  } else if (type === 'error') {
+    iconBox.classList.add('alert-icon-error');
+    iconBox.textContent = '✕';
+  } else {
+    iconBox.classList.add('alert-icon-info');
+    iconBox.textContent = 'ℹ';
+  }
+
+  modal.classList.add('active');
+}
+
+function closeCustomAlert() {
+  document.getElementById('alert-modal').classList.remove('active');
+  if (alertCallback) {
+    alertCallback();
+    alertCallback = null;
+  }
+}
+
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast-item toast-${type}`;
+  toast.innerHTML = `<span style="font-weight:600; font-size:13px;">${message}</span>`;
+  
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(10px)';
+    toast.style.transition = 'all 0.3s ease';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+/* ==========================================
+   THEME SWITCHER
+   ========================================== */
+
+function setAppTheme(themeName, element) {
+  document.documentElement.setAttribute('data-theme', themeName);
+  localStorage.setItem(LS_THEME_KEY, themeName);
+
+  if (element) {
+    document.querySelectorAll('.theme-option').forEach(el => el.classList.remove('active'));
+    element.classList.add('active');
+  }
+
+  if (chartInstance) {
+    initChart();
+    updateChartData();
+  }
+}
+
+// Load saved theme
+(function initTheme() {
+  const savedTheme = localStorage.getItem(LS_THEME_KEY) || 'dark-blue';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+})();
+
+/* ==========================================
+   CORE UTILITIES & CALCULATIONS
+   ========================================== */
+
+function formatMoney(n) {
+  if (n === undefined || n === null || isNaN(n)) return '0.00';
+  const isNegative = n < 0;
+  const abs = Math.abs(n);
+  let formatted = '';
+
+  if (abs >= 1e12) formatted = (abs / 1e12).toFixed(2) + ' T';
+  else if (abs >= 1e9) formatted = (abs / 1e9).toFixed(2) + ' B';
+  else if (abs >= 1e6) formatted = (abs / 1e6).toFixed(2) + ' M';
+  else if (abs >= 1e3) formatted = (abs / 1e3).toFixed(2) + ' K';
+  else formatted = abs.toFixed(2);
+
+  return isNegative ? '-' + formatted : formatted;
+}
+
+function getCurrentBalance(data) {
+  if (!data) return 0;
+  const baseBal = data.balance || 0;
+  if (!data.hourlyRate || data.hourlyRate <= 0 || !data.lastRateSetAt) return Math.max(0, baseBal);
+  const seconds = (Date.now() - data.lastRateSetAt) / 1000;
+  const calculated = baseBal + (data.hourlyRate / 3600) * seconds;
+  return Math.max(0, calculated);
+}
+
+function getCurrentLifetimeEarned(data) {
+  if (!data) return 0;
+  const baseLifetime = data.lifetimeEarned || 0;
+  if (!data.hourlyRate || data.hourlyRate <= 0 || !data.lastRateSetAt) return Math.max(0, baseLifetime);
+  const seconds = (Date.now() - data.lastRateSetAt) / 1000;
+  return Math.max(0, baseLifetime + (data.hourlyRate / 3600) * seconds);
+}
+
+function getBalanceAtTimestamp(data, targetTime) {
+  if (!data) return 0;
+  const now = Date.now();
+  if (targetTime >= now) return getCurrentBalance(data);
+
+  let bal = data.balance || 0;
+  const rate = data.hourlyRate || 0;
+  const lastSet = data.lastRateSetAt || now;
+
+  if (rate > 0) {
+    if (targetTime >= lastSet) {
+      const elapsed = (targetTime - lastSet) / 1000;
+      bal += (rate / 3600) * elapsed;
+    } else {
+      const diff = (lastSet - targetTime) / 1000;
+      bal -= (rate / 3600) * diff;
+    }
+  }
+
+  return Math.max(0, bal);
+}
+
+function formatDate(ts) {
+  if (!ts) return '-';
+  const d = new Date(ts);
+  return d.toLocaleDateString('en-US') + ' ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+}
+
+function clearError(id) { document.getElementById(id).textContent = ''; }
+function showError(id, msg) { document.getElementById(id).textContent = msg; }
+function shakeInput(el) {
+  el.classList.add('input-error');
+  setTimeout(() => el.classList.remove('input-error'), 600);
+}
+
+function hideAllScreens() {
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('password-screen').classList.add('hidden');
+  document.getElementById('main-screen').classList.add('hidden');
+}
+
+function showLogin() {
+  hideAllScreens();
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('login-username').value = '';
+  clearError('login-error');
+}
+
+function showPasswordScreen(username, isNew) {
+  hideAllScreens();
+  pendingUsername = username;
+  document.getElementById('password-screen').classList.remove('hidden');
+  clearError('existing-error');
+  clearError('new-error');
+
+  if (isNew) {
+    document.getElementById('password-title').textContent = 'Registration';
+    document.getElementById('password-subtitle').textContent = 'Create a password for ' + username;
+    document.getElementById('existing-user-form').classList.add('hidden');
+    document.getElementById('new-user-form').classList.remove('hidden');
+    document.getElementById('new-password').value = '';
+    document.getElementById('new-password-confirm').value = '';
+  } else {
+    document.getElementById('password-title').textContent = 'Welcome back';
+    document.getElementById('password-subtitle').textContent = 'Enter password for ' + username;
+    document.getElementById('existing-user-form').classList.remove('hidden');
+    document.getElementById('new-user-form').classList.add('hidden');
+    document.getElementById('existing-password').value = '';
+  }
+}
+
+function showMain(username) {
+  hideAllScreens();
+  currentUser = username;
+  document.getElementById('main-screen').classList.remove('hidden');
+  initChart();
+  startUserListener(username);
+  startLiveTimer();
+}
+
+function startUserListener(username) {
+  if (userListener) userListener.off();
+  userListener = db.ref('users/' + username);
+  userListener.on('value', snapshot => {
+    const data = snapshot.val();
+    if (!data) { doLogout(); return; }
+    currentData = data;
+    updateUI();
+  }, err => {
+    console.error('Firebase error:', err);
+    showError('login-error', 'Database connection error.');
+  });
+}
+
+window.onUsernameSubmit = function() {
+  const input = document.getElementById('login-username');
+  const raw = input.value.trim();
+  clearError('login-error');
+  if (!raw) { showError('login-error', "Enter username"); shakeInput(input); return; }
+  if (raw.length < 2) { showError('login-error', "Username is too short"); shakeInput(input); return; }
+
+  db.ref('users/' + raw).once('value')
+    .then(snapshot => showPasswordScreen(raw, !snapshot.exists()))
+    .catch(() => showError('login-error', 'Network error.'));
+};
+
+window.onCreateAccount = function() {
+  const pass = document.getElementById('new-password').value;
+  const confirm = document.getElementById('new-password-confirm').value;
+  clearError('new-error');
+
+  if (!pass) { showError('new-error', 'Enter password'); shakeInput(document.getElementById('new-password')); return; }
+  if (pass.length < 4) { showError('new-error', 'Password must contain min. 4 characters'); shakeInput(document.getElementById('new-password')); return; }
+  if (pass !== confirm) { showError('new-error', 'Passwords do not match'); shakeInput(document.getElementById('new-password-confirm')); return; }
+
+  const userData = {
+    password: pass,
+    balance: 0,
+    hourlyRate: 0,
+    lifetimeEarned: 0,
+    transactions: [],
+    createdAt: Date.now(),
+    lastRateSetAt: Date.now()
+  };
+
+  db.ref('users/' + pendingUsername).set(userData)
+    .then(() => {
+      localStorage.setItem(LS_SESSION_USER, pendingUsername);
+      localStorage.setItem(LS_SESSION_TIME, Date.now().toString());
+      showMain(pendingUsername);
+      showToast('Account created successfully!', 'success');
+    })
+    .catch(() => showError('new-error', 'Account creation error.'));
+};
+
+window.onExistingLogin = function() {
+  const pass = document.getElementById('existing-password').value;
+  clearError('existing-error');
+  if (!pass) { showError('existing-error', 'Enter password'); shakeInput(document.getElementById('existing-password')); return; }
+
+  db.ref('users/' + pendingUsername).once('value')
+    .then(snapshot => {
+      const data = snapshot.val();
+      if (!data) { showError('existing-error', 'Account not found'); return; }
+      if (data.password !== pass) { showError('existing-error', 'Incorrect password'); shakeInput(document.getElementById('existing-password')); return; }
+      localStorage.setItem(LS_SESSION_USER, pendingUsername);
+      localStorage.setItem(LS_SESSION_TIME, Date.now().toString());
+      showMain(pendingUsername);
+      showToast('Login successful!', 'success');
+    })
+    .catch(() => showError('existing-error', 'Connection error.'));
+};
+
+window.backToLogin = function() { pendingUsername = null; showLogin(); };
+
+window.doLogout = function() {
+  if (userListener) { userListener.off(); userListener = null; }
+  currentUser = null; currentData = null;
+  if (timerInterval) clearInterval(timerInterval);
+  if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+  localStorage.removeItem(LS_SESSION_USER);
+  localStorage.removeItem(LS_SESSION_TIME);
+  showLogin();
+};
+
+function openProfileModal() {
+  if (!currentData || !currentUser) return;
+  document.getElementById('modal-username').textContent = currentUser;
+  document.getElementById('modal-avatar').textContent = currentUser.charAt(0).toUpperCase();
+  document.getElementById('modal-created-at').textContent = 'Account created: ' + formatDate(currentData.createdAt);
+  document.getElementById('modal-tx-count').textContent = (currentData.transactions || []).length;
+  clearError('pwd-modal-error');
+  document.getElementById('pwd-old').value = '';
+  document.getElementById('pwd-new').value = '';
+  
+  const currentTheme = localStorage.getItem(LS_THEME_KEY) || 'dark-blue';
+  document.querySelectorAll('.theme-option').forEach(el => {
+    if (el.classList.contains('theme-opt-' + currentTheme)) el.classList.add('active');
+    else el.classList.remove('active');
+  });
+
+  document.getElementById('profile-modal').classList.add('active');
+}
+
+function closeProfileModal() {
+  document.getElementById('profile-modal').classList.remove('active');
+}
+
+window.onChangePassword = function() {
+  const oldP = document.getElementById('pwd-old').value;
+  const newP = document.getElementById('pwd-new').value;
+  clearError('pwd-modal-error');
+
+  if (!oldP || !newP) {
+    showError('pwd-modal-error', 'Fill in all fields');
+    return;
+  }
+  if (oldP !== currentData.password) {
+    showError('pwd-modal-error', 'Current password is incorrect');
+    return;
+  }
+  if (newP.length < 4) {
+    showError('pwd-modal-error', 'New password min. 4 characters');
+    return;
+  }
+
+  db.ref('users/' + currentUser + '/password').set(newP)
+    .then(() => {
+      closeProfileModal();
+      showCustomAlert('Success!', 'Your password has been successfully updated.', 'success');
+    })
+    .catch(() => showError('pwd-modal-error', 'Error updating password'));
+};
+
+function updateUI() {
+  if (!currentData || !currentUser) return;
+
+  const initial = currentUser.charAt(0).toUpperCase();
+  document.getElementById('user-name').textContent = currentUser;
+  document.getElementById('avatar-initial').textContent = initial;
+
+  updateBalanceDisplay();
+
+  const hourly = currentData.hourlyRate || 0;
+  document.getElementById('hourly-rate').textContent = formatMoney(hourly) + ' / hr';
+  document.getElementById('minutely-rate').textContent = '+' + formatMoney(hourly / 60);
+
+  const status = document.getElementById('rate-status');
+  if (hourly > 0) {
+    status.textContent = 'Active';
+    status.style.color = 'var(--positive-green)';
+    document.getElementById('live-badge').classList.remove('hidden');
+  } else {
+    status.textContent = 'Inactive';
+    status.style.color = 'var(--text-muted)';
+    document.getElementById('live-badge').classList.add('hidden');
+  }
+
+  const liveEarned = getCurrentLifetimeEarned(currentData);
+  document.getElementById('lifetime-earned').textContent = formatMoney(liveEarned);
+
+  renderTransactions(currentData.transactions);
+  updateChartData();
+}
+
+function updateBalanceDisplay() {
+  if (!currentData) return;
+  const bal = getCurrentBalance(currentData);
+  const el = document.getElementById('balance');
+  el.textContent = formatMoney(bal);
+  el.style.color = 'var(--text-primary)';
+}
+
+function renderTransactions(list) {
+  const container = document.getElementById('tx-list');
+  if (!list || list.length === 0) {
+    container.innerHTML = '<div style="text-align:center; padding: 24px; color: var(--text-muted); font-size:14px;">No transactions yet</div>';
+    return;
+  }
+  container.innerHTML = list.slice().reverse().map(tx => `
+    <div class="tx-row">
+      <div>
+        <div style="font-size:14px; font-weight:600;">${tx.desc || 'Accrual'}</div>
+        <div class="tx-date">${formatDate(tx.date)}</div>
+      </div>
+      <div class="tx-amount ${tx.amount >= 0 ? 'positive' : 'negative'}">
+        ${tx.amount >= 0 ? '+' : ''}${formatMoney(tx.amount)}
+      </div>
+    </div>
+  `).join('');
+}
+
+function getComputedStyleProp(prop) {
+  return getComputedStyle(document.documentElement).getPropertyValue(prop).trim();
+}
+
+function initChart() {
+  const ctx = document.getElementById('balanceChart').getContext('2d');
+  if (chartInstance) chartInstance.destroy();
+
+  const accentColor = getComputedStyleProp('--accent-primary') || '#3b82f6';
+  const cardBg = getComputedStyleProp('--bg-card') || '#12161f';
+  const textPrimary = getComputedStyleProp('--text-primary') || '#f3f4f6';
+  const textMuted = getComputedStyleProp('--text-muted') || '#6b7280';
+  const borderColor = getComputedStyleProp('--border-color') || '#202736';
+
+  const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+  gradient.addColorStop(0, accentColor + '44');
+  gradient.addColorStop(1, accentColor + '00');
+
+  chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'Balance',
+        data: [],
+        borderColor: accentColor,
+        borderWidth: 2.5,
+        backgroundColor: gradient,
+        fill: true,
+        tension: 0.35,
+        pointRadius: 0,
+        pointHoverRadius: 6,
+        pointHoverBackgroundColor: accentColor,
+        pointHoverBorderColor: '#ffffff',
+        pointHoverBorderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        duration: 400,
+        easing: 'easeOutQuart'
+      },
+      interaction: {
+        intersect: false,
+        mode: 'index',
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: cardBg,
+          titleColor: textMuted,
+          bodyColor: textPrimary,
+          borderColor: borderColor,
+          borderWidth: 1,
+          padding: 10,
+          displayColors: false,
+          callbacks: {
+            label: function(context) {
+              return 'Balance: ' + formatMoney(context.parsed.y);
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(255, 255, 255, 0.04)' },
+          ticks: { color: textMuted, font: { size: 10 } }
+        },
+        y: {
+          beginAtZero: false, // Гнучке масштабування замість фіксованого нульового старту
+          grid: { color: 'rgba(255, 255, 255, 0.04)' },
+          ticks: {
+            color: textMuted,
+            font: { size: 10 },
+            callback: val => formatMoney(val)
+          }
+        }
+      }
+    }
+  });
+}
+
+window.setTimeframe = function(tf, btnElement) {
+  currentTimeframe = tf;
+  document.querySelectorAll('.tf-btn').forEach(btn => btn.classList.remove('active'));
+  if (btnElement) btnElement.classList.add('active');
+  updateChartData();
+};
+
+function updateChartData() {
+  if (!chartInstance || !currentData) return;
+
+  const now = Date.now();
+  let startTime = now - 60 * 1000;
+  let pointsCount = 30;
+
+  if (currentTimeframe === '1h') {
+    startTime = now - 60 * 60 * 1000;
+  } else if (currentTimeframe === '1d') {
+    startTime = now - 24 * 60 * 60 * 1000;
+  } else if (currentTimeframe === 'all') {
+    startTime = currentData.createdAt || (now - 7 * 24 * 60 * 60 * 1000);
+  }
+
+  const step = (now - startTime) / pointsCount;
+  const labels = [];
+  const points = [];
+
+  for (let i = 0; i <= pointsCount; i++) {
+    const t = startTime + step * i;
+    const d = new Date(t);
+
+    if (currentTimeframe === '1m') {
+      labels.push(d.toLocaleTimeString('en-US', { minute: '2-digit', second: '2-digit' }));
+    } else if (currentTimeframe === '1h') {
+      labels.push(d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }));
+    } else {
+      labels.push(d.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit' }));
+    }
+
+    points.push(getBalanceAtTimestamp(currentData, t));
+  }
+
+  chartInstance.data.labels = labels;
+  chartInstance.data.datasets[0].data = points;
+
+  // Динамічний розрахунок масштабу Y-осі
+  const minVal = Math.min(...points);
+  const maxVal = Math.max(...points);
+  const diff = maxVal - minVal;
+  const padding = diff > 0 ? diff * 0.15 : (minVal || 1) * 0.001;
+
+  chartInstance.options.scales.y.min = Math.max(0, minVal - padding);
+  chartInstance.options.scales.y.max = maxVal + padding;
+
+  chartInstance.update();
+}
+
+function startLiveTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    updateBalanceDisplay();
+    if (currentTimeframe === '1m' && chartInstance && currentData) {
+      const now = Date.now();
+      const currentVal = getCurrentBalance(currentData);
+      const timeLabel = new Date(now).toLocaleTimeString('en-US', { minute: '2-digit', second: '2-digit' });
+
+      chartInstance.data.labels.shift();
+      chartInstance.data.datasets[0].data.shift();
+
+      chartInstance.data.labels.push(timeLabel);
+      chartInstance.data.datasets[0].data.push(currentVal);
+
+      // Динамічний перерахунок масштабу в реальному часі для живих точок
+      const currentPoints = chartInstance.data.datasets[0].data;
+      const minVal = Math.min(...currentPoints);
+      const maxVal = Math.max(...currentPoints);
+      const diff = maxVal - minVal;
+      const padding = diff > 0 ? diff * 0.15 : (minVal || 1) * 0.001;
+
+      chartInstance.options.scales.y.min = Math.max(0, minVal - padding);
+      chartInstance.options.scales.y.max = maxVal + padding;
+
+      chartInstance.update('none');
+    }
+  }, 1000);
+}
+
+// Session Auto-Login Check
+(function checkSession() {
+  const savedUser = localStorage.getItem(LS_SESSION_USER);
+  const savedTime = localStorage.getItem(LS_SESSION_TIME);
+  if (savedUser && savedTime && (Date.now() - parseInt(savedTime, 10)) < SESSION_MS) {
+    showMain(savedUser);
+  } else {
+    showLogin();
+  }
+})();
+</script>
+</body>
+</html>
