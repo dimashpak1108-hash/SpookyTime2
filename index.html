@@ -17,7 +17,6 @@
      1. COLOR THEMES DEFINITIONS
      ========================================== */
   
-  /* Theme 1: Dark Blue (Default Neon) */
   [data-theme="dark-blue"] {
     --bg-main: #0a0c10;
     --bg-card: #12161f;
@@ -39,7 +38,6 @@
     --warning-yellow: #f59e0b;
   }
 
-  /* Theme 2: Emerald Green Cyber */
   [data-theme="emerald"] {
     --bg-main: #06140e;
     --bg-card: #0d2118;
@@ -61,7 +59,6 @@
     --warning-yellow: #fbbf24;
   }
 
-  /* Theme 3: Cyberpunk Violet / Purple */
   [data-theme="purple"] {
     --bg-main: #0d0a1a;
     --bg-card: #16112a;
@@ -83,7 +80,6 @@
     --warning-yellow: #f59e0b;
   }
 
-  /* Theme 4: Sunset Crimson Amber */
   [data-theme="amber"] {
     --bg-main: #140d0a;
     --bg-card: #211612;
@@ -105,7 +101,6 @@
     --warning-yellow: #fbbf24;
   }
 
-  /* Theme 5: Light Pro Slate */
   [data-theme="light"] {
     --bg-main: #f1f5f9;
     --bg-card: #ffffff;
@@ -405,35 +400,6 @@
     font-variant-numeric: tabular-nums;
   }
 
-  .timeframe-bar {
-    display: flex;
-    background: var(--bg-input);
-    padding: 4px;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border-color);
-    gap: 4px;
-    margin-bottom: 16px;
-  }
-
-  .tf-btn {
-    flex: 1;
-    padding: 6px 0;
-    font-size: 12px;
-    font-weight: 600;
-    border: none;
-    background: transparent;
-    color: var(--text-muted);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: all var(--transition-fast);
-  }
-
-  .tf-btn.active {
-    background: var(--bg-card);
-    color: var(--text-primary);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  }
-
   .chart-container {
     position: relative;
     height: 220px;
@@ -487,7 +453,6 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* Theme Switcher Options in Profile */
   .theme-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -579,7 +544,6 @@
   }
   .close-btn:hover { color: var(--text-primary); }
 
-  /* In-App Custom Modal Alert Window */
   .custom-alert-card {
     text-align: center;
     max-width: 380px;
@@ -614,7 +578,6 @@
     border: 2px solid var(--accent-primary);
   }
 
-  /* In-App Toast System */
   #toast-container {
     position: fixed;
     bottom: 24px;
@@ -668,10 +631,8 @@
 
 <div class="offline-banner" id="offline-banner">Connection lost. Data may be outdated.</div>
 
-<!-- Toast Container for Notifications -->
 <div id="toast-container"></div>
 
-<!-- CUSTOM IN-APP ALERT MODAL DIALOG -->
 <div class="modal-overlay" id="alert-modal">
   <div class="modal-card custom-alert-card">
     <div class="alert-icon-box" id="alert-icon-box">✓</div>
@@ -704,7 +665,6 @@
       <div class="label" style="text-transform:none; font-size:14px;" id="password-subtitle">Enter your password</div>
     </div>
     <div class="card">
-      <!-- Existing User Form -->
       <div id="existing-user-form">
         <div class="label">Password</div>
         <input id="existing-password" type="password" class="input" placeholder="••••••••" autocomplete="off">
@@ -712,7 +672,6 @@
         <button class="btn btn-primary" style="width:100%; margin-top:12px;" onclick="onExistingLogin()">Log In</button>
       </div>
 
-      <!-- New User Registration Form -->
       <div id="new-user-form" class="hidden">
         <div class="label">Create a password</div>
         <input id="new-password" type="password" class="input" placeholder="Minimum 4 characters" autocomplete="off">
@@ -731,7 +690,6 @@
 
   <!-- SCREEN 3: MAIN DASHBOARD -->
   <div id="main-screen" class="screen hidden">
-    <!-- Top Navigation Header -->
     <div class="header">
       <div class="user-chip" id="user-chip" onclick="openProfileModal()">
         <div class="user-avatar" id="avatar-initial">U</div>
@@ -740,7 +698,6 @@
       <button class="btn btn-secondary" style="padding: 8px 14px; font-size:13px;" onclick="doLogout()">Log Out</button>
     </div>
 
-    <!-- Current Balance Card -->
     <div class="card">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <div class="label">Current Balance</div>
@@ -751,7 +708,6 @@
       </div>
     </div>
 
-    <!-- Hourly Rate Card -->
     <div class="card rate-box">
       <div>
         <div class="label" style="margin-bottom:2px; color:var(--text-muted);">Hourly Rate</div>
@@ -760,24 +716,14 @@
       <div style="font-size:13px; font-weight:600; color:var(--text-muted);" id="rate-status">Inactive</div>
     </div>
 
-    <!-- Balance Chart Card -->
     <div class="card">
-      <div class="label" style="margin-bottom:12px;">Balance Dynamics</div>
-      
-      <!-- Timeframe Selector -->
-      <div class="timeframe-bar">
-        <button class="tf-btn active" onclick="setTimeframe('1m', this)">1m</button>
-        <button class="tf-btn" onclick="setTimeframe('1h', this)">1h</button>
-        <button class="tf-btn" onclick="setTimeframe('1d', this)">1d</button>
-        <button class="tf-btn" onclick="setTimeframe('all', this)">All time</button>
-      </div>
+      <div class="label" style="margin-bottom:12px;">Balance Dynamics (All Time)</div>
 
       <div class="chart-container">
         <canvas id="balanceChart"></canvas>
       </div>
     </div>
 
-    <!-- Lifetime Statistics Grid -->
     <div class="card">
       <div class="label" style="margin-bottom:14px;">Account Statistics</div>
       <div class="stats-grid">
@@ -792,7 +738,6 @@
       </div>
     </div>
 
-    <!-- Transactions List -->
     <div>
       <div class="label" style="margin-left:4px; margin-bottom:10px;">Transaction History</div>
       <div class="card" id="tx-list" style="padding: 10px 20px;">
@@ -803,7 +748,6 @@
 
 </div>
 
-<!-- USER PROFILE & SETTINGS MODAL -->
 <div class="modal-overlay" id="profile-modal">
   <div class="modal-card">
     <div class="modal-header">
@@ -817,7 +761,6 @@
       <div style="font-size:13px; color: var(--text-muted);" id="modal-created-at">Account created: -</div>
     </div>
 
-    <!-- Theme Switcher -->
     <div style="margin-bottom: 16px;">
       <div class="label">App Theme</div>
       <div class="theme-grid">
@@ -840,7 +783,6 @@
       </div>
     </div>
 
-    <!-- Change Password Section -->
     <div style="border-top: 1px solid var(--border-color); padding-top: 16px;">
       <div class="label">Change Password</div>
       <input id="pwd-old" type="password" class="input" placeholder="Current password" style="margin-bottom:8px;">
@@ -852,7 +794,6 @@
 </div>
 
 <script>
-// Mandatory Firebase Config
 const firebaseConfig = {
     apiKey: "AIzaSyDHtCHRG9o1Alpa8qDgezcakfNdQogs-_w",
     authDomain: "spookytime-a7302.firebaseapp.com",
@@ -864,15 +805,12 @@ const firebaseConfig = {
     measurementId: "G-SYZJ94852S"
 };
 
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// Network status tracking
 window.addEventListener('online', () => document.getElementById('offline-banner').style.display = 'none');
 window.addEventListener('offline', () => document.getElementById('offline-banner').style.display = 'block');
 
-// State Constants
 const LS_SESSION_USER = 'payroll_user_session';
 const LS_SESSION_TIME = 'payroll_user_session_time';
 const LS_THEME_KEY = 'payroll_app_theme';
@@ -884,12 +822,7 @@ let userListener = null;
 let currentData = null;
 let timerInterval = null;
 let chartInstance = null;
-let currentTimeframe = '1m';
 let alertCallback = null;
-
-/* ==========================================
-   IN-APP CUSTOM MODALS & NOTIFICATION SYSTEM
-   ========================================== */
 
 function showCustomAlert(title, message, type = 'success', callback = null) {
   const modal = document.getElementById('alert-modal');
@@ -937,10 +870,6 @@ function showToast(message, type = 'info') {
   }, 3000);
 }
 
-/* ==========================================
-   THEME SWITCHER
-   ========================================== */
-
 function setAppTheme(themeName, element) {
   document.documentElement.setAttribute('data-theme', themeName);
   localStorage.setItem(LS_THEME_KEY, themeName);
@@ -956,29 +885,14 @@ function setAppTheme(themeName, element) {
   }
 }
 
-// Load saved theme
 (function initTheme() {
   const savedTheme = localStorage.getItem(LS_THEME_KEY) || 'dark-blue';
   document.documentElement.setAttribute('data-theme', savedTheme);
 })();
 
-/* ==========================================
-   CORE UTILITIES & CALCULATIONS
-   ========================================== */
-
 function formatMoney(n) {
   if (n === undefined || n === null || isNaN(n)) return '0.00';
-  const isNegative = n < 0;
-  const abs = Math.abs(n);
-  let formatted = '';
-
-  if (abs >= 1e12) formatted = (abs / 1e12).toFixed(2) + ' T';
-  else if (abs >= 1e9) formatted = (abs / 1e9).toFixed(2) + ' B';
-  else if (abs >= 1e6) formatted = (abs / 1e6).toFixed(2) + ' M';
-  else if (abs >= 1e3) formatted = (abs / 1e3).toFixed(2) + ' K';
-  else formatted = abs.toFixed(2);
-
-  return isNegative ? '-' + formatted : formatted;
+  return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function getCurrentBalance(data) {
@@ -1341,7 +1255,7 @@ function initChart() {
           ticks: { color: textMuted, font: { size: 10 } }
         },
         y: {
-          beginAtZero: false, // Гнучке масштабування замість фіксованого нульового старту
+          beginAtZero: false,
           grid: { color: 'rgba(255, 255, 255, 0.04)' },
           ticks: {
             color: textMuted,
@@ -1354,27 +1268,12 @@ function initChart() {
   });
 }
 
-window.setTimeframe = function(tf, btnElement) {
-  currentTimeframe = tf;
-  document.querySelectorAll('.tf-btn').forEach(btn => btn.classList.remove('active'));
-  if (btnElement) btnElement.classList.add('active');
-  updateChartData();
-};
-
 function updateChartData() {
   if (!chartInstance || !currentData) return;
 
   const now = Date.now();
-  let startTime = now - 60 * 1000;
-  let pointsCount = 30;
-
-  if (currentTimeframe === '1h') {
-    startTime = now - 60 * 60 * 1000;
-  } else if (currentTimeframe === '1d') {
-    startTime = now - 24 * 60 * 60 * 1000;
-  } else if (currentTimeframe === 'all') {
-    startTime = currentData.createdAt || (now - 7 * 24 * 60 * 60 * 1000);
-  }
+  const startTime = currentData.createdAt || (now - 7 * 24 * 60 * 60 * 1000);
+  const pointsCount = 30;
 
   const step = (now - startTime) / pointsCount;
   const labels = [];
@@ -1383,22 +1282,13 @@ function updateChartData() {
   for (let i = 0; i <= pointsCount; i++) {
     const t = startTime + step * i;
     const d = new Date(t);
-
-    if (currentTimeframe === '1m') {
-      labels.push(d.toLocaleTimeString('en-US', { minute: '2-digit', second: '2-digit' }));
-    } else if (currentTimeframe === '1h') {
-      labels.push(d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }));
-    } else {
-      labels.push(d.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit' }));
-    }
-
+    labels.push(d.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit' }));
     points.push(getBalanceAtTimestamp(currentData, t));
   }
 
   chartInstance.data.labels = labels;
   chartInstance.data.datasets[0].data = points;
 
-  // Динамічний розрахунок масштабу Y-осі
   const minVal = Math.min(...points);
   const maxVal = Math.max(...points);
   const diff = maxVal - minVal;
@@ -1412,35 +1302,39 @@ function updateChartData() {
 
 function startLiveTimer() {
   if (timerInterval) clearInterval(timerInterval);
+  
+  let chartRefreshCounter = 0;
+
   timerInterval = setInterval(() => {
     updateBalanceDisplay();
-    if (currentTimeframe === '1m' && chartInstance && currentData) {
-      const now = Date.now();
+
+    if (chartInstance && currentData) {
       const currentVal = getCurrentBalance(currentData);
-      const timeLabel = new Date(now).toLocaleTimeString('en-US', { minute: '2-digit', second: '2-digit' });
+      const dataArr = chartInstance.data.datasets[0].data;
 
-      chartInstance.data.labels.shift();
-      chartInstance.data.datasets[0].data.shift();
+      if (dataArr.length > 0) {
+        dataArr[dataArr.length - 1] = currentVal;
 
-      chartInstance.data.labels.push(timeLabel);
-      chartInstance.data.datasets[0].data.push(currentVal);
+        const minVal = Math.min(...dataArr);
+        const maxVal = Math.max(...dataArr);
+        const diff = maxVal - minVal;
+        const padding = diff > 0 ? diff * 0.15 : (minVal || 1) * 0.001;
 
-      // Динамічний перерахунок масштабу в реальному часі для живих точок
-      const currentPoints = chartInstance.data.datasets[0].data;
-      const minVal = Math.min(...currentPoints);
-      const maxVal = Math.max(...currentPoints);
-      const diff = maxVal - minVal;
-      const padding = diff > 0 ? diff * 0.15 : (minVal || 1) * 0.001;
+        chartInstance.options.scales.y.min = Math.max(0, minVal - padding);
+        chartInstance.options.scales.y.max = maxVal + padding;
 
-      chartInstance.options.scales.y.min = Math.max(0, minVal - padding);
-      chartInstance.options.scales.y.max = maxVal + padding;
-
-      chartInstance.update('none');
+        chartInstance.update('none');
+      }
     }
-  }, 1000);
+
+    chartRefreshCounter++;
+    if (chartRefreshCounter >= 100) {
+      chartRefreshCounter = 0;
+      updateChartData();
+    }
+  }, 100);
 }
 
-// Session Auto-Login Check
 (function checkSession() {
   const savedUser = localStorage.getItem(LS_SESSION_USER);
   const savedTime = localStorage.getItem(LS_SESSION_TIME);
