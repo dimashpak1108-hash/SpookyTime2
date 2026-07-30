@@ -1,1323 +1,1457 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en" data-theme="dark-blue">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Executive & System Control</title>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        /* ==========================================================================
-           1. CSS VARIABLES & SYSTEM THEME CONFIGURATION
-           ========================================================================== */
-        :root {
-            --bg-body: #060609;
-            --bg-sidebar: #0a0a10;
-            --bg-card: #0f0f17;
-            --bg-card-hover: #141420;
-            --bg-input: #12121c;
-            --border-color: #1a1a28;
-            --border-hover: #2a2a3e;
-            --border-focus: #6366f1;
-
-            --text-main: #f3f4f6;
-            --text-muted: #6b6c7e;
-            --text-subtle: #4b4c5d;
-
-            --accent-purple: #8b5cf6;
-            --accent-purple-hover: #7c3aed;
-            --accent-purple-glow: rgba(139, 92, 246, 0.25);
-            
-            --accent-blue: #3b82f6;
-            --accent-green: #10b981;
-            --accent-green-bg: rgba(16, 185, 129, 0.1);
-            --accent-red: #ef4444;
-            --accent-red-bg: rgba(239, 68, 68, 0.1);
-            --accent-yellow: #f59e0b;
-
-            --radius-sm: 6px;
-            --radius-md: 10px;
-            --radius-lg: 16px;
-            --radius-xl: 24px;
-
-            --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-bounce: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-
-            --font-main: 'Plus Jakarta Sans', sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-        }
-
-        /* ==========================================================================
-           2. GLOBAL RESETS & CORE STYLES
-           ========================================================================== */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-        }
-
-        body {
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            font-family: var(--font-main);
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        input, button, select, textarea {
-            font-family: inherit;
-            outline: none;
-        }
-
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.02);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--border-hover);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
-        .input-field {
-            width: 100%;
-            background: var(--bg-input);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 14px 16px;
-            color: var(--text-main);
-            font-size: 14px;
-            transition: var(--transition-fast);
-        }
-
-        .input-field:focus {
-            border-color: var(--accent-purple);
-            box-shadow: 0 0 0 3px var(--accent-purple-glow);
-        }
-
-        .btn-primary {
-            width: 100%;
-            background: var(--accent-purple);
-            color: #ffffff;
-            border: none;
-            border-radius: var(--radius-md);
-            padding: 14px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition-fast);
-            box-shadow: 0 4px 12px var(--accent-purple-glow);
-        }
-
-        .btn-primary:hover {
-            background: var(--accent-purple-hover);
-            transform: translateY(-1px);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-
-        /* ==========================================================================
-           3. MAIN ADMIN LAYOUT STRUCTURE
-           ========================================================================== */
-        .app-container {
-            display: flex;
-            width: 100vw;
-            height: 100vh;
-            background: var(--bg-body);
-            position: relative;
-        }
-
-        .sidebar {
-            width: 320px;
-            background: var(--bg-sidebar);
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            padding: 24px 18px;
-            gap: 20px;
-            z-index: 10;
-        }
-
-        .sidebar-brand {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 6px;
-        }
-
-        .brand-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 800;
-            font-size: 18px;
-            letter-spacing: -0.5px;
-            cursor: pointer;
-            padding: 6px 10px;
-            border-radius: var(--radius-md);
-            transition: var(--transition-fast);
-        }
-
-        .brand-logo:hover {
-            background: var(--bg-card-hover);
-        }
-
-        .brand-icon {
-            width: 32px;
-            height: 32px;
-            background: var(--accent-purple);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            box-shadow: 0 0 15px var(--accent-purple-glow);
-        }
-
-        .account-selector-btn {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 12px 16px;
-            color: var(--text-main);
-            font-size: 14px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            transition: var(--transition-fast);
-        }
-
-        .account-selector-btn:hover {
-            border-color: var(--border-hover);
-            background: var(--bg-card-hover);
-        }
-
-        .search-box {
-            position: relative;
-        }
-
-        .search-input {
-            width: 100%;
-            background: var(--bg-input);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 10px 14px 10px 38px;
-            color: var(--text-main);
-            font-size: 13px;
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            width: 16px;
-            height: 16px;
-        }
-
-        .user-list {
-            flex: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            padding-right: 4px;
-        }
-
-        .user-card {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 14px;
-            border-radius: var(--radius-md);
-            background: transparent;
-            border: 1px solid transparent;
-            cursor: pointer;
-            transition: var(--transition-fast);
-        }
-
-        .user-card:hover {
-            background: var(--bg-card);
-            border-color: var(--border-color);
-        }
-
-        .user-card.active {
-            background: var(--bg-card);
-            border-color: rgba(139, 92, 246, 0.4);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        .user-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: #1a1a2e;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 14px;
-            color: var(--accent-purple);
-            border: 1px solid rgba(139, 92, 246, 0.2);
-        }
-
-        .user-info {
-            flex: 1;
-            margin-left: 12px;
-            overflow: hidden;
-        }
-
-        .user-name-text {
-            font-size: 14px;
-            font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .user-balance-text {
-            font-size: 12px;
-            color: var(--text-muted);
-            font-family: var(--font-mono);
-            margin-top: 2px;
-        }
-
-        .user-status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--accent-green);
-            box-shadow: 0 0 8px var(--accent-green);
-        }
-
-        .workspace {
-            flex: 1;
-            height: 100vh;
-            overflow-y: auto;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            gap: 28px;
-            background: radial-gradient(circle at top right, rgba(139, 92, 246, 0.03), transparent 60%);
-        }
-
-        .empty-workspace {
-            margin: auto;
-            text-align: center;
-            color: var(--text-muted);
-        }
-
-        .empty-icon {
-            width: 64px;
-            height: 64px;
-            margin: 0 auto 16px;
-            color: var(--text-subtle);
-        }
-
-        /* ==========================================================================
-           4. DASHBOARD & USER DETAILS COMPONENTS
-           ========================================================================== */
-        .user-header-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-bottom: 24px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .user-title-group {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .user-large-avatar {
-            width: 56px;
-            height: 56px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.2));
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            font-weight: 800;
-            color: #ffffff;
-        }
-
-        .user-main-name {
-            font-size: 28px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-        }
-
-        .user-created-date {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
-        .header-total-balance {
-            text-align: right;
-        }
-
-        .total-balance-label {
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-muted);
-        }
-
-        .total-balance-amount {
-            font-size: 32px;
-            font-weight: 800;
-            font-family: var(--font-mono);
-            letter-spacing: -1px;
-            background: linear-gradient(180deg, #ffffff, #a5a6f6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-
-        .metric-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            position: relative;
-            overflow: hidden;
-            transition: var(--transition-smooth);
-        }
-
-        .metric-card:hover {
-            border-color: var(--border-hover);
-            transform: translateY(-2px);
-        }
-
-        .metric-label {
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-        }
-
-        .metric-value {
-            font-size: 26px;
-            font-weight: 800;
-            font-family: var(--font-mono);
-            letter-spacing: -0.5px;
-        }
-
-        .live-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 4px 8px;
-            border-radius: 20px;
-            background: var(--accent-green-bg);
-            color: var(--accent-green);
-            position: absolute;
-            top: 20px;
-            right: 20px;
-        }
-
-        .pulse-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--accent-green);
-            animation: livePulse 1.5s infinite;
-        }
-
-        @keyframes livePulse {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(1.3); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-
-        .rate-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .rate-display {
-            font-size: 26px;
-            font-weight: 800;
-            color: var(--accent-purple);
-            font-family: var(--font-mono);
-        }
-
-        .rate-unit {
-            font-size: 16px;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .action-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-        }
-
-        .action-buttons-group {
-            display: flex;
-            gap: 14px;
-            margin-top: 14px;
-        }
-
-        .btn-action {
-            padding: 12px 20px;
-            border-radius: var(--radius-md);
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            border: none;
-            transition: var(--transition-fast);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-action-purple {
-            background: var(--accent-purple);
-            color: #ffffff;
-            box-shadow: 0 4px 14px var(--accent-purple-glow);
-        }
-
-        .btn-action-purple:hover {
-            background: var(--accent-purple-hover);
-        }
-
-        .btn-action-outline {
-            background: transparent;
-            border: 1px solid var(--border-hover);
-            color: var(--text-main);
-        }
-
-        .btn-action-outline:hover {
-            background: var(--bg-card-hover);
-            border-color: #3b3b54;
-        }
-
-        .btn-action-danger {
-            background: transparent;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: var(--accent-red);
-        }
-
-        .btn-action-danger:hover {
-            background: var(--accent-red-bg);
-            border-color: var(--accent-red);
-        }
-
-        .history-section {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-
-        .section-header-title {
-            font-size: 11px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-muted);
-        }
-
-        .history-table-container {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .history-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 18px 24px;
-            border-bottom: 1px solid var(--border-color);
-            transition: var(--transition-fast);
-        }
-
-        .history-row:last-child {
-            border-bottom: none;
-        }
-
-        .history-row:hover {
-            background: var(--bg-card-hover);
-        }
-
-        .history-info {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .history-title {
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .history-date {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .history-amount {
-            font-size: 15px;
-            font-weight: 700;
-            font-family: var(--font-mono);
-        }
-
-        .amount-positive {
-            color: var(--accent-green);
-        }
-
-        .amount-negative {
-            color: var(--accent-red);
-        }
-
-        .danger-zone-card {
-            background: rgba(239, 68, 68, 0.02);
-            border: 1px solid rgba(239, 68, 68, 0.15);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-
-        .danger-info-title {
-            color: var(--accent-red);
-            font-size: 14px;
-            font-weight: 700;
-        }
-
-        .danger-info-desc {
-            color: var(--text-muted);
-            font-size: 12px;
-            margin-top: 4px;
-        }
-
-        /* ==========================================================================
-           5. MODAL SYSTEM DIALOGS
-           ========================================================================== */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(12px);
-            z-index: 900;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transition-smooth);
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal-body {
-            width: 100%;
-            max-width: 580px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-xl);
-            padding: 32px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-            transform: translateY(20px);
-            transition: var(--transition-smooth);
-        }
-
-        .modal-overlay.active .modal-body {
-            transform: translateY(0);
-        }
-
-        .modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-        }
-
-        .modal-title {
-            font-size: 20px;
-            font-weight: 800;
-        }
-
-        .modal-close-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            font-size: 20px;
-        }
-
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-            margin-top: 28px;
-        }
-
-        /* ==========================================================================
-           6. TOAST NOTIFICATION SYSTEM
-           ========================================================================== */
-        .toast-container {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            z-index: 10000;
-        }
-
-        .toast {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-left: 4px solid var(--accent-purple);
-            padding: 14px 20px;
-            border-radius: var(--radius-md);
-            color: var(--text-main);
-            font-size: 13px;
-            font-weight: 600;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            animation: slideToast 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        @keyframes slideToast {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payroll — Admin Panel</title>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+<style>
+  [data-theme="dark-blue"] {
+    --bg-main: #0a0c10;
+    --bg-card: #12161f;
+    --bg-card-hover: #181d29;
+    --bg-input: #0a0d14;
+    --border-color: #202736;
+    --border-focus: #3b82f6;
+    --text-primary: #f3f4f6;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+    --accent-primary: #3b82f6;
+    --accent-glow: rgba(59, 130, 246, 0.18);
+    --positive-green: #10b981;
+    --positive-glow: rgba(16, 185, 129, 0.18);
+    --danger-red: #ef4444;
+    --danger-glow: rgba(239, 68, 68, 0.18);
+    --warning-yellow: #f59e0b;
+  }
+
+  [data-theme="emerald"] {
+    --bg-main: #06140e;
+    --bg-card: #0d2118;
+    --bg-card-hover: #122b20;
+    --bg-input: #040e0a;
+    --border-color: #17382a;
+    --border-focus: #10b981;
+    --text-primary: #ecfdf5;
+    --text-secondary: #a7f3d0;
+    --text-muted: #059669;
+    --accent-primary: #10b981;
+    --accent-glow: rgba(16, 185, 129, 0.22);
+    --positive-green: #34d399;
+    --positive-glow: rgba(52, 211, 153, 0.22);
+    --danger-red: #f87171;
+    --danger-glow: rgba(248, 113, 113, 0.22);
+    --warning-yellow: #fbbf24;
+  }
+
+  [data-theme="purple"] {
+    --bg-main: #0d0a1a;
+    --bg-card: #16112a;
+    --bg-card-hover: #1f183b;
+    --bg-input: #090712;
+    --border-color: #2a204d;
+    --border-focus: #8b5cf6;
+    --text-primary: #f5f3ff;
+    --text-secondary: #ddd6fe;
+    --text-muted: #8b5cf6;
+    --accent-primary: #8b5cf6;
+    --accent-glow: rgba(139, 92, 246, 0.25);
+    --positive-green: #10b981;
+    --positive-glow: rgba(16, 185, 129, 0.22);
+    --danger-red: #ec4899;
+    --danger-glow: rgba(236, 72, 153, 0.22);
+    --warning-yellow: #f59e0b;
+  }
+
+  [data-theme="amber"] {
+    --bg-main: #140d0a;
+    --bg-card: #211612;
+    --bg-card-hover: #2b1d18;
+    --bg-input: #0d0806;
+    --border-color: #3b251e;
+    --border-focus: #f97316;
+    --text-primary: #fff7ed;
+    --text-secondary: #ffedd5;
+    --text-muted: #c2410c;
+    --accent-primary: #f97316;
+    --accent-glow: rgba(249, 115, 22, 0.22);
+    --positive-green: #10b981;
+    --positive-glow: rgba(16, 185, 129, 0.2);
+    --danger-red: #ef4444;
+    --danger-glow: rgba(239, 68, 68, 0.2);
+    --warning-yellow: #fbbf24;
+  }
+
+  [data-theme="light"] {
+    --bg-main: #f1f5f9;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f8fafc;
+    --bg-input: #f8fafc;
+    --border-color: #cbd5e1;
+    --border-focus: #2563eb;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --accent-primary: #2563eb;
+    --accent-glow: rgba(37, 99, 235, 0.15);
+    --positive-green: #059669;
+    --positive-glow: rgba(5, 150, 105, 0.15);
+    --danger-red: #dc2626;
+    --danger-glow: rgba(220, 38, 38, 0.15);
+    --warning-yellow: #d97706;
+  }
+
+  :root {
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --radius-full: 9999px;
+    --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+    --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: var(--font-family);
+    min-height: 100vh;
+    display: flex;
+    padding: 12px;
+    line-height: 1.5;
+    transition: background-color var(--transition-smooth), color var(--transition-smooth);
+  }
+
+  .app-container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 16px;
+  }
+
+  .hidden { display: none !important; }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4);
+  }
+
+  .label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+
+  .input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background: var(--bg-input);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 15px;
+    outline: none;
+    transition: all var(--transition-fast);
+  }
+
+  .input:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 4px var(--accent-glow);
+  }
+
+  .input-error {
+    border-color: var(--danger-red) !important;
+    animation: shake 0.4s ease;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 20px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    width: 100%;
+  }
+
+  .btn:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--border-focus);
+  }
+
+  .btn:active { transform: scale(0.98); }
+
+  .btn-primary {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: #ffffff;
+  }
+
+  .btn-primary:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 4px 20px var(--accent-glow);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    border-color: var(--border-color);
+    color: var(--text-primary);
+  }
+
+  .btn-danger {
+    background: var(--danger-red);
+    border-color: var(--danger-red);
+    color: #ffffff;
+  }
+
+  .btn-danger:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 4px 20px var(--danger-glow);
+  }
+
+  .error-msg {
+    color: var(--danger-red);
+    font-size: 13px;
+    margin-top: 8px;
+    min-height: 20px;
+  }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+  }
+
+  .admin-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  .admin-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .admin-btn {
+    padding: 8px 12px;
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all var(--transition-fast);
+  }
+
+  .admin-btn:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--accent-primary);
+  }
+
+  .users-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+  }
+
+  .user-item {
+    padding: 14px 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .user-item:hover {
+    border-color: var(--border-focus);
+    background: var(--bg-card-hover);
+  }
+
+  .user-item.active {
+    border-color: var(--accent-primary);
+    background: var(--accent-glow);
+  }
+
+  .user-avatar-small {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--accent-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #fff;
+    font-weight: 700;
+    margin-right: 8px;
+  }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  .main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .user-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+
+  .user-info-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .user-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--accent-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: #fff;
+    font-weight: 700;
+  }
+
+  .user-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .user-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+  }
+
+  .user-name:hover {
+    background: var(--bg-input);
+    color: var(--accent-primary);
+  }
+
+  .user-created {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .live-balance-top {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+
+  .live-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .live-amount {
+    font-size: 24px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+  }
+
+  .balance-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .balance-card {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    height: 120px;
+    justify-content: space-between;
+  }
+
+  .balance-card-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .live-badge {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--positive-green);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .live-dot {
+    width: 5px;
+    height: 5px;
+    background: var(--positive-green);
+    border-radius: 50%;
+    box-shadow: 0 0 6px var(--positive-green);
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.85); }
+  }
+
+  .balance-amount {
+    font-size: 28px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+  }
+
+  .rate-box {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .rate-info {
+    flex: 1;
+  }
+
+  .rate-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+
+  .rate-value {
+    font-size: 20px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent-primary);
+    margin-bottom: 4px;
+  }
+
+  .rate-value::before {
+    content: '$ ';
+  }
+
+  .rate-period {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .rate-box .btn {
+    flex-shrink: 0;
+    width: auto;
+    padding: 12px 24px;
+  }
+
+  .actions-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+    margin-left: 0;
+  }
+
+  .actions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .actions-grid .btn {
+    width: 100%;
+  }
+
+  .tx-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+    margin-left: 0;
+  }
+
+  .tx-container {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+  }
+
+  .tx-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .tx-row:last-child {
+    border-bottom: none;
+  }
+
+  .tx-info {
+    flex: 1;
+  }
+
+  .tx-desc {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+  }
+
+  .tx-date {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .tx-amount {
+    font-weight: 700;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .tx-amount.positive { color: var(--positive-green); }
+  .tx-amount.negative { color: var(--danger-red); }
+
+  .modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s var(--transition-smooth);
+  }
+
+  .modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .modal-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 440px;
+    padding: 26px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    transform: scale(0.92);
+    transition: transform 0.25s var(--transition-smooth);
+  }
+
+  .modal-overlay.active .modal-card {
+    transform: scale(1);
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .modal-title {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .close-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 22px;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .close-btn:hover { color: var(--text-primary); }
+
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .theme-option {
+    height: 38px;
+    border-radius: var(--radius-md);
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .theme-option.active {
+    border-color: var(--text-primary) !important;
+    transform: scale(1.08);
+  }
+
+  .theme-opt-dark-blue { background: #3b82f6; }
+  .theme-opt-emerald { background: #10b981; }
+  .theme-opt-purple { background: #8b5cf6; }
+  .theme-opt-amber { background: #f97316; }
+  .theme-opt-light { background: #e2e8f0; }
+
+  #toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 320px;
+    width: calc(100% - 48px);
+    pointer-events: none;
+  }
+
+  .toast-item {
+    pointer-events: auto;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--accent-primary);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    animation: toastIn 0.3s var(--transition-smooth) forwards;
+  }
+
+  .toast-item.toast-success { border-left-color: var(--positive-green); }
+  .toast-item.toast-error { border-left-color: var(--danger-red); }
+
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .modal-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .modal-buttons .btn {
+    width: 100%;
+  }
+
+  @media (max-width: 1023px) {
+    .app-container {
+      grid-template-columns: 1fr;
+    }
+
+    .users-list {
+      flex-direction: row;
+      max-height: 120px;
+      overflow-x: auto;
+    }
+
+    .user-item {
+      flex-shrink: 0;
+      min-width: 100px;
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .user-avatar-small {
+      margin-right: 0;
+      width: 40px;
+      height: 40px;
+    }
+
+    .balance-cards {
+      grid-template-columns: 1fr;
+    }
+
+    .rate-box {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .rate-box .btn {
+      width: 100%;
+    }
+
+    .actions-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .user-header-top {
+      flex-direction: column;
+      gap: 12px;
+    }
+  }
+</style>
 </head>
 <body>
 
-    <!-- MAIN APPLICATION LAYOUT -->
-    <div class="app-container">
-        <aside class="sidebar">
-            <div class="sidebar-brand">
-                <div class="brand-logo" onclick="openAdminProfileModal()" title="Відкрити Admin Профіль та Логи">
-                    <div class="brand-icon">⚡</div>
-                    <span>Admin</span>
-                </div>
-            </div>
+<div id="toast-container"></div>
 
-            <button class="account-selector-btn" onclick="openNewUserModal()">
-                <span>➕ Create User</span>
-                <span style="color: var(--text-muted); font-size: 11px;">NEW</span>
-            </button>
+<!-- LOGIN SCREEN -->
+<div id="login-screen" style="width: 100%; max-width: 400px; margin: 0 auto; padding-top: 60px;">
+  <div class="card" style="text-align: center; padding: 48px 32px;">
+    <div style="font-size: 28px; font-weight: 800; margin-bottom: 12px;">Admin Panel</div>
+    <div class="label" style="text-transform: none; font-size: 14px; margin-bottom: 28px;">Enter admin password</div>
+    <input id="admin-password" type="password" class="input" placeholder="••••" style="margin-bottom: 12px;">
+    <div class="error-msg" id="login-error"></div>
+    <button class="btn btn-primary" onclick="adminLogin()">Login</button>
+  </div>
+</div>
 
-            <div class="search-box">
-                <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                </svg>
-                <input type="text" id="userSearchInput" class="search-input" placeholder="Search users..." oninput="filterUsers()">
-            </div>
-
-            <div class="user-list" id="userListContainer"></div>
-        </aside>
-
-        <main class="workspace" id="workspaceContainer">
-            <div class="empty-workspace">
-                <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                </svg>
-                <p>Select a user from the sidebar to manage their account</p>
-            </div>
-        </main>
-    </div>
-
-    <!-- MODALS -->
-    
-    <!-- Modal: Admin Profile & System Movement Logs -->
-    <div class="modal-overlay" id="adminProfileModal">
-        <div class="modal-body">
-            <div class="modal-header">
-                <h3 class="modal-title">⚡ Admin Profile & System Audit Log</h3>
-                <button class="modal-close-btn" onclick="closeModal('adminProfileModal')">✕</button>
-            </div>
-
-            <div class="history-section">
-                <div class="section-header-title">ALL MOVEMENTS & SYSTEM LOGS (ГОЛОВНИЙ ЛОГ)</div>
-                <div class="history-table-container" id="adminAuditLogContainer" style="max-height: 250px;">
-                    <!-- Logs dynamically rendered here -->
-                </div>
-            </div>
-
-            <div class="modal-actions">
-                <button class="btn-action btn-action-outline" onclick="closeModal('adminProfileModal')">Close</button>
-            </div>
+<!-- MAIN ADMIN SCREEN -->
+<div id="admin-screen" class="hidden">
+  <div class="app-container">
+    <!-- LEFT SIDEBAR -->
+    <div class="sidebar">
+      <div class="admin-header">
+        <div class="admin-logo">
+          <div class="admin-icon">⚡</div>
+          <span>Admin</span>
         </div>
+        <button class="admin-btn" onclick="openAdminSettings()">⚙️</button>
+      </div>
+
+      <div style="display: flex; gap: 8px; margin-bottom: 4px;">
+        <button onclick="openCreateUserModal()" style="background: none; border: none; color: var(--text-primary); cursor: pointer; font-size: 14px; font-weight: 600; padding: 0;">+ Create User</button>
+        <span style="font-size: 11px; font-weight: 700; color: var(--accent-primary); background: var(--accent-glow); padding: 2px 8px; border-radius: var(--radius-full);">NEW</span>
+      </div>
+
+      <div class="card" style="padding: 12px; margin-bottom: 0;">
+        <input id="users-search" class="input" placeholder="Search users..." style="margin: 0;">
+      </div>
+
+      <div class="users-list" id="users-list"></div>
     </div>
 
-    <!-- Modal: Alert Dialog -->
-    <div class="modal-overlay" id="customAlertModal">
-        <div class="modal-body" style="text-align: center; max-width: 420px;">
-            <div class="modal-header" style="justify-content: center; margin-bottom: 12px;">
-                <h3 class="modal-title" id="customModalTitle">Сповіщення</h3>
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+      <div id="empty-state" class="card empty-state">
+        Select a user from the list
+      </div>
+
+      <div id="user-details" class="hidden">
+        <!-- USER HEADER -->
+        <div class="user-header-top">
+          <div class="user-info-left">
+            <div class="user-avatar" id="detail-avatar">U</div>
+            <div class="user-meta">
+              <div class="user-name" id="detail-username" onclick="showUserInfo()">username</div>
+              <div class="user-created" id="detail-created">Created: -</div>
             </div>
-            <p id="customModalText" style="color: var(--text-muted); font-size: 14px; margin-bottom: 24px; line-height: 1.5;"></p>
-            <div class="modal-actions" id="customModalActions" style="justify-content: center;">
-                <button class="btn-action btn-action-purple" onclick="closeModal('customAlertModal')">Зрозуміло</button>
-            </div>
+          </div>
+          <div class="live-balance-top">
+            <div class="live-label">LIVE BALANCE</div>
+            <div class="live-amount" id="detail-live-balance">0.00</div>
+          </div>
         </div>
-    </div>
 
-    <!-- Modal: Update Balance -->
-    <div class="modal-overlay" id="balanceModal">
-        <div class="modal-body">
-            <div class="modal-header">
-                <h3 class="modal-title">Update Balance</h3>
-                <button class="modal-close-btn" onclick="closeModal('balanceModal')">✕</button>
+        <!-- BALANCE CARDS -->
+        <div class="balance-cards">
+          <div class="balance-card">
+            <div class="balance-card-label">
+              CURRENT BALANCE
+              <span class="live-badge"><span class="live-dot"></span>LIVE ACCRUAL</span>
             </div>
-            <div class="form-group">
-                <label class="form-label">Deposit / Withdrawal Amount (+ / -)</label>
-                <input type="number" step="0.01" id="balanceAmountInput" class="input-field" placeholder="e.g. 1000000 or -500">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Note / Description</label>
-                <input type="text" id="balanceNoteInput" class="input-field" placeholder="Admin Deposit">
-            </div>
-            <div class="modal-actions">
-                <button class="btn-action btn-action-outline" onclick="closeModal('balanceModal')">Cancel</button>
-                <button class="btn-action btn-action-purple" onclick="submitBalanceUpdate()">Apply Change</button>
-            </div>
+            <div class="balance-amount" id="detail-balance">0.00</div>
+          </div>
+          <div class="balance-card">
+            <div class="balance-card-label">TOTAL EARNED (ALL TIME)</div>
+            <div class="balance-amount" id="detail-lifetime">0.00</div>
+          </div>
         </div>
-    </div>
 
-    <!-- Modal: Change Hourly Rate -->
-    <div class="modal-overlay" id="rateModal">
-        <div class="modal-body">
-            <div class="modal-header">
-                <h3 class="modal-title">Change Hourly Rate</h3>
-                <button class="modal-close-btn" onclick="closeModal('rateModal')">✕</button>
-            </div>
-            <div class="form-group">
-                <label class="form-label">New Hourly Accrual Rate ($ / hr)</label>
-                <input type="number" step="0.01" id="rateAmountInput" class="input-field" placeholder="e.g. 5000000">
-            </div>
-            <div class="modal-actions">
-                <button class="btn-action btn-action-outline" onclick="closeModal('rateModal')">Cancel</button>
-                <button class="btn-action btn-action-purple" onclick="submitRateUpdate()">Save Rate</button>
-            </div>
+        <!-- HOURLY RATE -->
+        <div class="rate-box">
+          <div class="rate-info">
+            <div class="rate-label">Hourly Accrual Rate</div>
+            <div class="rate-value" id="detail-rate">0.00</div>
+            <div class="rate-period">/ hour</div>
+          </div>
+          <button class="btn btn-secondary" onclick="openChangeRateModal()">Change rate</button>
         </div>
-    </div>
 
-    <!-- Modal: Create New User -->
-    <div class="modal-overlay" id="newUserModal">
-        <div class="modal-body">
-            <div class="modal-header">
-                <h3 class="modal-title">Create New Account</h3>
-                <button class="modal-close-btn" onclick="closeModal('newUserModal')">✕</button>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Username</label>
-                <input type="text" id="newUsernameInput" class="input-field" placeholder="Username">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Initial Balance ($)</label>
-                <input type="number" id="newInitialBalanceInput" class="input-field" placeholder="0.00">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Initial Hourly Rate ($ / hr)</label>
-                <input type="number" id="newInitialRateInput" class="input-field" placeholder="0.00">
-            </div>
-            <div class="modal-actions">
-                <button class="btn-action btn-action-outline" onclick="closeModal('newUserModal')">Cancel</button>
-                <button class="btn-action btn-action-purple" onclick="submitCreateUser()">Create User</button>
-            </div>
+        <!-- ACTIONS -->
+        <div class="actions-label">ACTIONS & SIMULATIONS</div>
+        <div class="actions-grid">
+          <button class="btn btn-primary" onclick="openUpdateBalanceModal()">Update balance</button>
+          <button class="btn btn-secondary" onclick="openSimulateModal()">🎲 Simulate</button>
+          <button class="btn btn-secondary" onclick="resetBalance()">Reset balance</button>
         </div>
+
+        <!-- TRANSACTIONS -->
+        <div class="tx-label">TRANSACTION & ACCOUNT HISTORY</div>
+        <div class="tx-container" id="detail-transactions">
+          <div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 14px;">No transactions</div>
+        </div>
+
+        <!-- DELETE BUTTON -->
+        <div style="margin-top: 20px;">
+          <button class="btn btn-danger" onclick="openDeleteUserModal()">Delete Account</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="change-rate-modal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title">Change Hourly Rate</div>
+      <button class="close-btn" onclick="closeModal('change-rate-modal')">&times;</button>
+    </div>
+    <div class="label">New Hourly Rate</div>
+    <input id="rate-input" type="number" class="input" placeholder="e.g. 100" step="0.01" style="margin-bottom: 12px;">
+    <div class="error-msg" id="rate-error"></div>
+    <div class="modal-buttons">
+      <button class="btn btn-secondary" onclick="closeModal('change-rate-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitChangeRate()">Update Rate</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="update-balance-modal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title">Update Balance</div>
+      <button class="close-btn" onclick="closeModal('update-balance-modal')">&times;</button>
+    </div>
+    <div class="label">Amount</div>
+    <input id="update-amount" type="number" class="input" placeholder="e.g. 50" step="0.01" style="margin-bottom: 16px;">
+    <div class="error-msg" id="update-balance-error"></div>
+    <div class="modal-buttons">
+      <button class="btn btn-danger" onclick="submitUpdateBalance('subtract')">Subtract</button>
+      <button class="btn btn-primary" onclick="submitUpdateBalance('add')">Add</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="simulate-modal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title">Simulate Event</div>
+      <button class="close-btn" onclick="closeModal('simulate-modal')">&times;</button>
+    </div>
+    <p style="color: var(--text-secondary); margin-bottom: 16px;">Select a simulation type</p>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <button class="btn btn-secondary" onclick="submitSimulate('login')">Player Login</button>
+      <button class="btn btn-secondary" onclick="submitSimulate('logout')">Player Logout</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="delete-user-modal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title">Delete Account</div>
+      <button class="close-btn" onclick="closeModal('delete-user-modal')">&times;</button>
+    </div>
+    <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 20px;">
+      Are you sure you want to delete <strong id="delete-username">username</strong>? This action cannot be undone.
+    </div>
+    <div class="modal-buttons">
+      <button class="btn btn-secondary" onclick="closeModal('delete-user-modal')">Cancel</button>
+      <button class="btn btn-danger" onclick="submitDeleteUser()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="admin-settings-modal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title">Admin Settings</div>
+      <button class="close-btn" onclick="closeModal('admin-settings-modal')">&times;</button>
     </div>
 
-    <div class="toast-container" id="toastContainer"></div>
+    <div style="margin-bottom: 20px;">
+      <div class="label">App Theme</div>
+      <div class="theme-grid">
+        <div class="theme-option theme-opt-dark-blue active" onclick="setAdminTheme('dark-blue', this)"></div>
+        <div class="theme-option theme-opt-emerald" onclick="setAdminTheme('emerald', this)"></div>
+        <div class="theme-option theme-opt-purple" onclick="setAdminTheme('purple', this)"></div>
+        <div class="theme-option theme-opt-amber" onclick="setAdminTheme('amber', this)"></div>
+        <div class="theme-option theme-opt-light" onclick="setAdminTheme('light', this)"></div>
+      </div>
+    </div>
 
-    <script>
-        let selectedUserId = null;
+    <div style="border-top: 1px solid var(--border-color); padding-top: 16px; margin-bottom: 16px;">
+      <div class="label">Change Admin Password</div>
+      <input id="old-password" type="password" class="input" placeholder="Current password" style="margin-bottom: 8px;">
+      <input id="new-admin-password" type="password" class="input" placeholder="New password" style="margin-bottom: 12px;">
+      <div class="error-msg" id="pwd-error"></div>
+      <button class="btn btn-primary" onclick="submitChangeAdminPassword()">Update Password</button>
+    </div>
 
-        const DEFAULT_USERS = [
-            { id: 1, name: "PveUzar", balance: 0.00, totalEarned: 0.00, rate: 0.00, created: "25/07/2026 14:20", history: [] },
-            { id: 2, name: "Spooky_bb", balance: 0.00, totalEarned: 0.00, rate: 0.00, created: "26/07/2026 18:10", history: [] },
-            { 
-                id: 3, 
-                name: "Tramplin", 
-                balance: 16413432.45, 
-                totalEarned: 264134722.95, 
-                rate: 6113232.00, 
-                created: "27/07/2026 02:14",
-                history: [
-                    { type: "Admin Deposit", date: "28/07/2026 19:18", amount: 10000000.00 },
-                    { type: "Balance reset by admin (payout)", date: "28/07/2026 18:47", amount: -247721290.50 },
-                    { type: "Auto accrual", date: "28/07/2026 18:47", amount: 247721290.50 }
-                ]
-            }
-        ];
+    <div style="text-align: center;">
+      <button class="btn btn-secondary" onclick="adminLogout()">Logout</button>
+    </div>
+  </div>
+</div>
 
-        let users = [];
-        let systemLogs = [];
+<div class="modal-overlay" id="user-info-modal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title">User Information</div>
+      <button class="close-btn" onclick="closeModal('user-info-modal')">&times;</button>
+    </div>
+    <div style="text-align: center;">
+      <div class="user-avatar" id="info-avatar" style="width: 54px; height: 54px; font-size: 22px; margin: 0 auto 12px;">U</div>
+      <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px;" id="info-username">username</div>
+      <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;" id="info-created">Created: -</div>
+      <div style="text-align: left; background: var(--bg-input); padding: 14px; border-radius: var(--radius-md);">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: var(--text-muted); font-size: 13px;">Current Balance:</span>
+          <span style="font-weight: 600; font-variant-numeric: tabular-nums;" id="info-balance">0.00</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: var(--text-muted); font-size: 13px;">Total Earned:</span>
+          <span style="font-weight: 600; font-variant-numeric: tabular-nums;" id="info-lifetime">0.00</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: var(--text-muted); font-size: 13px;">Hourly Rate:</span>
+          <span style="font-weight: 600; font-variant-numeric: tabular-nums;" id="info-rate">0.00</span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--text-muted); font-size: 13px;">Total Transactions:</span>
+          <span style="font-weight: 600;" id="info-tx-count">0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-        function initApp() {
-            const storedData = localStorage.getItem("admin_users_db");
-            if (storedData) {
-                try {
-                    users = JSON.parse(storedData);
-                } catch (e) {
-                    users = DEFAULT_USERS;
-                }
-            } else {
-                users = DEFAULT_USERS;
-                saveData();
-            }
+<div class="modal-overlay" id="create-user-modal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title">Create New User</div>
+      <button class="close-btn" onclick="closeModal('create-user-modal')">&times;</button>
+    </div>
+    <div class="label">Username</div>
+    <input id="create-username" class="input" placeholder="e.g. alex_dev" style="margin-bottom: 12px;">
+    <div class="label">Initial Password</div>
+    <input id="create-password" type="password" class="input" placeholder="••••" style="margin-bottom: 12px;">
+    <div class="label">Initial Hourly Rate (Optional)</div>
+    <input id="create-rate" type="number" class="input" placeholder="e.g. 100" step="0.01" style="margin-bottom: 12px;">
+    <div class="error-msg" id="create-error"></div>
+    <div class="modal-buttons">
+      <button class="btn btn-secondary" onclick="closeModal('create-user-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitCreateUser()">Create User</button>
+    </div>
+  </div>
+</div>
 
-            const storedLogs = localStorage.getItem("admin_system_logs");
-            if (storedLogs) {
-                try {
-                    systemLogs = JSON.parse(storedLogs);
-                } catch (e) { systemLogs = []; }
-            }
+<script>
+  setTimeout(() => {
+    const firebaseConfig = {
+      apiKey: "AIzaSyDHtCHRG9o1Alpa8qDgezcakfNdQogs-_w",
+      authDomain: "spookytime-a7302.firebaseapp.com",
+      databaseURL: "https://spookytime-a7302-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "spookytime-a7302",
+      storageBucket: "spookytime-a7302.firebasestorage.app",
+      messagingSenderId: "196885981587",
+      appId: "1:196885981587:web:4ebf769c820a740cb32066",
+      measurementId: "G-SYZJ94852S"
+    };
+    firebase.initializeApp(firebaseConfig);
+    window.db = firebase.database();
+  }, 500);
 
-            renderSidebar();
-            startAccrualEngine();
-        }
+const LS_ADMIN_SESSION = 'payroll_admin_session';
+const LS_ADMIN_PASS = 'payroll_admin_password';
+const LS_ADMIN_THEME = 'payroll_admin_theme';
+const DEFAULT_ADMIN_PASS = '1111';
 
-        function saveData() {
-            localStorage.setItem("admin_users_db", JSON.stringify(users));
-            localStorage.setItem("admin_system_logs", JSON.stringify(systemLogs));
-        }
+let selectedUser = null;
+let allUsers = {};
+let usersListener = null;
+let userDataListeners = {};
+let updateTimers = {};
 
-        // Add to Global Audit Log & User Log
-        function recordMovement(userName, actionTitle, amount = null) {
-            const dateStr = new Date().toLocaleString('en-GB');
-            const logEntry = {
-                user: userName,
-                action: actionTitle,
-                date: dateStr,
-                amount: amount
-            };
+function formatMoney(n) {
+  if (n === undefined || n === null || isNaN(n)) return '0.00';
+  return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
 
-            systemLogs.unshift(logEntry);
-            
-            // Add to User's internal history as well
-            const targetUser = users.find(u => u.name === userName);
-            if (targetUser && amount !== null) {
-                targetUser.history.unshift({
-                    type: actionTitle,
-                    date: dateStr,
-                    amount: amount
-                });
-            } else if (targetUser) {
-                targetUser.history.unshift({
-                    type: actionTitle,
-                    date: dateStr,
-                    amount: 0
-                });
-            }
+function formatMoneyShort(n) {
+  if (n === undefined || n === null || isNaN(n)) return '0.00';
+  const abs = Math.abs(n);
+  const sign = n < 0 ? '-' : '';
+  
+  if (abs >= 1000000000) {
+    return sign + (abs / 1000000000).toFixed(2) + ' ккк';
+  } else if (abs >= 1000000) {
+    return sign + (abs / 1000000).toFixed(2) + ' кк';
+  } else if (abs >= 1000) {
+    return sign + (abs / 1000).toFixed(2) + ' к';
+  }
+  return formatMoney(n);
+}
 
-            saveData();
-            showToast(`Лог: ${userName} — ${actionTitle}`);
-        }
+function formatDate(ts) {
+  if (!ts) return '-';
+  const d = new Date(ts);
+  return d.toLocaleDateString('en-US') + ' ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+}
 
-        // Simulate Player Account Login Event
-        function simulatePlayerLogin(userId) {
-            const user = users.find(u => u.id === userId);
-            if (user) {
-                recordMovement(user.name, "Гравець увійшов на аккаунт", null);
-                renderWorkspace();
-            }
-        }
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast-item toast-${type}`;
+  toast.innerHTML = `<span>${message}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(10px)';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
 
-        let lastAccrualTick = Date.now();
+function showError(id, msg) { document.getElementById(id).textContent = msg; }
+function clearError(id) { document.getElementById(id).textContent = ''; }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-        function startAccrualEngine() {
-            setInterval(() => {
-                const now = Date.now();
-                const deltaSeconds = (now - lastAccrualTick) / 1000;
-                lastAccrualTick = now;
+function setAdminTheme(theme, el) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem(LS_ADMIN_THEME, theme);
+  document.querySelectorAll('.theme-option').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+}
 
-                let stateChanged = false;
+(function initTheme() {
+  const theme = localStorage.getItem(LS_ADMIN_THEME) || 'dark-blue';
+  document.documentElement.setAttribute('data-theme', theme);
+})();
 
-                users.forEach(user => {
-                    if (user.rate > 0) {
-                        const accruedAmount = (user.rate / 3600) * deltaSeconds;
-                        user.balance += accruedAmount;
-                        user.totalEarned += accruedAmount;
-                        stateChanged = true;
-                    }
-                });
+function adminLogin() {
+  if (!window.db) { showError('login-error', 'Firebase initializing...'); return; }
+  const pass = document.getElementById('admin-password').value;
+  clearError('login-error');
+  if (!pass) { showError('login-error', 'Enter password'); return; }
+  const savedPass = localStorage.getItem(LS_ADMIN_PASS) || DEFAULT_ADMIN_PASS;
+  if (pass !== savedPass) { showError('login-error', 'Incorrect password'); return; }
+  localStorage.setItem(LS_ADMIN_SESSION, 'true');
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('admin-screen').classList.remove('hidden');
+  document.getElementById('admin-password').value = '';
+  loadUsers();
+}
 
-                if (stateChanged) {
-                    saveData();
-                    updateLiveUI();
-                }
-            }, 100);
-        }
+function adminLogout() {
+  localStorage.removeItem(LS_ADMIN_SESSION);
+  if (usersListener) usersListener.off();
+  Object.values(userDataListeners).forEach(l => l.off());
+  Object.values(updateTimers).forEach(t => clearInterval(t));
+  document.getElementById('admin-screen').classList.add('hidden');
+  document.getElementById('login-screen').classList.remove('hidden');
+  closeModal('admin-settings-modal');
+}
 
-        function openAdminProfileModal() {
-            renderAdminAuditLogs();
-            openModal('adminProfileModal');
-        }
+function loadUsers() {
+  if (!window.db) return;
+  if (usersListener) usersListener.off();
+  usersListener = window.db.ref('users');
+  usersListener.on('value', snapshot => {
+    allUsers = snapshot.val() || {};
+    renderUsersList();
+  });
+}
 
-        function renderAdminAuditLogs() {
-            const container = document.getElementById("adminAuditLogContainer");
-            if (systemLogs.length === 0) {
-                container.innerHTML = `<div class="history-row"><div class="history-title" style="color:var(--text-muted)">Логи руху відсутні</div></div>`;
-                return;
-            }
+function renderUsersList() {
+  const search = document.getElementById('users-search').value.toLowerCase();
+  const usernames = Object.keys(allUsers).filter(u => u.toLowerCase().includes(search));
+  document.getElementById('users-list').innerHTML = usernames.map(u => `
+    <div class="user-item ${selectedUser === u ? 'active' : ''}" onclick="selectUser('${u}')">
+      <div class="user-avatar-small">${u.charAt(0).toUpperCase()}</div>
+      <div>${u}</div>
+    </div>
+  `).join('');
+}
 
-            container.innerHTML = systemLogs.map(log => `
-                <div class="history-row">
-                    <div class="history-info">
-                        <div class="history-title"><strong>[${log.user}]</strong> ${log.action}</div>
-                        <div class="history-date">${log.date}</div>
-                    </div>
-                    <div class="history-amount ${log.amount > 0 ? 'amount-positive' : log.amount < 0 ? 'amount-negative' : ''}">
-                        ${log.amount ? (log.amount >= 0 ? '+' : '') + formatMoney(log.amount) : ''}
-                    </div>
-                </div>
-            `).join('');
-        }
+function selectUser(username) {
+  selectedUser = username;
+  renderUsersList();
+  showUserDetails(username);
+  startUserUpdateTimer(username);
+}
 
-        function formatMoney(val) {
-            return (val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/,/g, ' ');
-        }
+function showUserDetails(username) {
+  if (!allUsers[username]) return;
+  document.getElementById('empty-state').classList.add('hidden');
+  document.getElementById('user-details').classList.remove('hidden');
+  const initial = username.charAt(0).toUpperCase();
+  document.getElementById('detail-avatar').textContent = initial;
+  document.getElementById('detail-username').textContent = username;
+  if (!userDataListeners[username]) {
+    userDataListeners[username] = window.db.ref('users/' + username);
+    userDataListeners[username].on('value', snapshot => {
+      const data = snapshot.val();
+      if (data) updateUserDetailsDisplay(username, data);
+    });
+  }
+  updateUserDetailsDisplay(username, allUsers[username]);
+}
 
-        function renderSidebar() {
-            const container = document.getElementById("userListContainer");
-            const searchVal = document.getElementById("userSearchInput").value.toLowerCase();
+function getCurrentBalance(data) {
+  if (!data) return 0;
+  const baseBal = data.balance || 0;
+  if (!data.hourlyRate || data.hourlyRate <= 0 || !data.lastRateSetAt) return Math.max(0, baseBal);
+  const seconds = (Date.now() - data.lastRateSetAt) / 1000;
+  return Math.max(0, baseBal + (data.hourlyRate / 3600) * seconds);
+}
 
-            const filteredUsers = users.filter(u => u.name.toLowerCase().includes(searchVal));
+function getCurrentLifetimeEarned(data) {
+  if (!data) return 0;
+  const baseLifetime = data.lifetimeEarned || 0;
+  if (!data.hourlyRate || data.hourlyRate <= 0 || !data.lastRateSetAt) return Math.max(0, baseLifetime);
+  const seconds = (Date.now() - data.lastRateSetAt) / 1000;
+  return Math.max(0, baseLifetime + (data.hourlyRate / 3600) * seconds);
+}
 
-            container.innerHTML = filteredUsers.map(user => `
-                <div class="user-card ${user.id === selectedUserId ? 'active' : ''}" onclick="selectUser(${user.id})">
-                    <div class="user-avatar">${user.name.charAt(0).toUpperCase()}</div>
-                    <div class="user-info">
-                        <div class="user-name-text">${user.name}</div>
-                        <div class="user-balance-text" id="sidebar-bal-${user.id}">${formatMoney(user.balance)}</div>
-                    </div>
-                    <div class="user-status-dot"></div>
-                </div>
-            `).join('');
-        }
+function updateUserDetailsDisplay(username, data) {
+  const bal = getCurrentBalance(data);
+  const lifetime = getCurrentLifetimeEarned(data);
+  document.getElementById('detail-balance').textContent = formatMoney(bal);
+  document.getElementById('detail-lifetime').textContent = formatMoney(lifetime);
+  document.getElementById('detail-rate').textContent = formatMoney(data.hourlyRate || 0);
+  document.getElementById('detail-live-balance').textContent = formatMoney(bal);
+  document.getElementById('detail-created').textContent = 'Created: ' + formatDate(data.createdAt);
+  renderUserTransactions(data.transactions || []);
+}
 
-        function selectUser(id) {
-            selectedUserId = id;
-            renderSidebar();
-            renderWorkspace();
-        }
+function renderUserTransactions(list) {
+  const container = document.getElementById('detail-transactions');
+  if (!list || list.length === 0) {
+    container.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-muted);">No transactions</div>';
+    return;
+  }
+  container.innerHTML = list.slice().reverse().map(tx => `
+    <div class="tx-row">
+      <div class="tx-info">
+        <div class="tx-desc">${tx.desc || 'Transaction'}</div>
+        <div class="tx-date">${formatDate(tx.date)}</div>
+      </div>
+      <div class="tx-amount ${tx.amount >= 0 ? 'positive' : 'negative'}">
+        ${tx.amount >= 0 ? '+' : ''}${formatMoneyShort(tx.amount)}
+      </div>
+    </div>
+  `).join('');
+}
 
-        function filterUsers() {
-            renderSidebar();
-        }
+function startUserUpdateTimer(username) {
+  if (updateTimers[username]) clearInterval(updateTimers[username]);
+  updateTimers[username] = setInterval(() => {
+    if (selectedUser === username && allUsers[username]) {
+      const data = allUsers[username];
+      const bal = getCurrentBalance(data);
+      const lifetime = getCurrentLifetimeEarned(data);
+      document.getElementById('detail-balance').textContent = formatMoney(bal);
+      document.getElementById('detail-lifetime').textContent = formatMoney(lifetime);
+      document.getElementById('detail-live-balance').textContent = formatMoney(bal);
+    }
+  }, 100);
+}
 
-        function renderWorkspace() {
-            const container = document.getElementById("workspaceContainer");
-            const user = users.find(u => u.id === selectedUserId);
+function showUserInfo() {
+  if (!selectedUser || !allUsers[selectedUser]) return;
+  const data = allUsers[selectedUser];
+  const bal = getCurrentBalance(data);
+  const lifetime = getCurrentLifetimeEarned(data);
+  document.getElementById('info-avatar').textContent = selectedUser.charAt(0).toUpperCase();
+  document.getElementById('info-username').textContent = selectedUser;
+  document.getElementById('info-created').textContent = 'Created: ' + formatDate(data.createdAt);
+  document.getElementById('info-balance').textContent = formatMoney(bal);
+  document.getElementById('info-lifetime').textContent = formatMoney(lifetime);
+  document.getElementById('info-rate').textContent = formatMoney(data.hourlyRate || 0) + ' / hr';
+  document.getElementById('info-tx-count').textContent = (data.transactions || []).length;
+  document.getElementById('user-info-modal').classList.add('active');
+}
 
-            if (!user) {
-                container.innerHTML = `
-                    <div class="empty-workspace">
-                        <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                        </svg>
-                        <p>Select a user from the sidebar to manage their account</p>
-                    </div>
-                `;
-                return;
-            }
+function openChangeRateModal() {
+  if (!selectedUser || !allUsers[selectedUser]) return;
+  clearError('rate-error');
+  document.getElementById('rate-input').value = allUsers[selectedUser].hourlyRate || 0;
+  document.getElementById('change-rate-modal').classList.add('active');
+}
 
-            container.innerHTML = `
-                <div class="user-header-bar">
-                    <div class="user-title-group">
-                        <div class="user-large-avatar">${user.name.charAt(0).toUpperCase()}</div>
-                        <div>
-                            <div class="user-main-name">${user.name}</div>
-                            <div class="user-created-date">Created: ${user.created}</div>
-                        </div>
-                    </div>
-                    <div class="header-total-balance">
-                        <div class="total-balance-label">Live Balance</div>
-                        <div class="total-balance-amount" id="live-header-bal">${formatMoney(user.balance)}</div>
-                    </div>
-                </div>
+function submitChangeRate() {
+  const amount = parseFloat(document.getElementById('rate-input').value);
+  clearError('rate-error');
+  if (isNaN(amount) || amount < 0) { showError('rate-error', 'Enter valid amount'); return; }
+  window.db.ref('users/' + selectedUser).update({
+    hourlyRate: amount,
+    lastRateSetAt: Date.now()
+  }).then(() => {
+    closeModal('change-rate-modal');
+    showToast('Hourly rate updated!', 'success');
+  }).catch(() => showError('rate-error', 'Update failed'));
+}
 
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <div class="live-indicator"><div class="pulse-dot"></div> LIVE ACCRUAL</div>
-                        <div class="metric-label">CURRENT BALANCE</div>
-                        <div class="metric-value" id="live-card-bal">${formatMoney(user.balance)}</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-label">TOTAL EARNED (ALL TIME)</div>
-                        <div class="metric-value" id="live-card-earned">${formatMoney(user.totalEarned)}</div>
-                    </div>
-                </div>
+function openUpdateBalanceModal() {
+  clearError('update-balance-error');
+  document.getElementById('update-amount').value = '';
+  document.getElementById('update-balance-modal').classList.add('active');
+}
 
-                <div class="rate-card">
-                    <div>
-                        <div class="metric-label">HOURLY ACCRUAL RATE</div>
-                        <div class="rate-display">$ ${formatMoney(user.rate)} <span class="rate-unit">/ hour</span></div>
-                    </div>
-                    <button class="btn-action btn-action-outline" onclick="openModal('rateModal')">Change rate</button>
-                </div>
+function submitUpdateBalance(action) {
+  const amount = parseFloat(document.getElementById('update-amount').value);
+  clearError('update-balance-error');
+  if (isNaN(amount) || amount <= 0) { showError('update-balance-error', 'Enter valid amount'); return; }
+  if (!selectedUser || !allUsers[selectedUser]) return;
+  const data = allUsers[selectedUser];
+  const currentBal = getCurrentBalance(data);
+  const newBal = action === 'add' ? currentBal + amount : currentBal - amount;
+  if (newBal < 0) { showError('update-balance-error', 'Insufficient balance'); return; }
+  const txDesc = action === 'add' ? 'Admin added' : 'Admin subtracted';
+  const txs = data.transactions || [];
+  txs.push({ desc: txDesc, amount: action === 'add' ? amount : -amount, date: Date.now() });
+  window.db.ref('users/' + selectedUser).update({
+    balance: newBal,
+    lifetimeEarned: (data.lifetimeEarned || 0) + (action === 'add' ? amount : 0),
+    transactions: txs,
+    lastRateSetAt: Date.now()
+  }).then(() => {
+    closeModal('update-balance-modal');
+    showToast(action === 'add' ? 'Balance added!' : 'Balance subtracted!', 'success');
+  }).catch(() => showError('update-balance-error', 'Update failed'));
+}
 
-                <div class="action-card">
-                    <div class="metric-label">ACTIONS & SIMULATIONS</div>
-                    <div class="action-buttons-group">
-                        <button class="btn-action btn-action-purple" onclick="openModal('balanceModal')">Update balance</button>
-                        <button class="btn-action btn-action-outline" onclick="simulatePlayerLogin(${user.id})">🔑 Симулювати вхід гравця</button>
-                        <button class="btn-action btn-action-danger" onclick="resetUserBalance(${user.id})">Reset balance</button>
-                    </div>
-                </div>
+function resetBalance() {
+  if (!selectedUser || !allUsers[selectedUser]) return;
+  const data = allUsers[selectedUser];
+  const currentBal = getCurrentBalance(data);
+  if (currentBal === 0) { showToast('Balance already 0', 'success'); return; }
+  window.db.ref('users/' + selectedUser).update({
+    balance: 0,
+    lastRateSetAt: Date.now()
+  }).then(() => showToast('Balance reset!', 'success')).catch(() => showToast('Reset failed', 'error'));
+}
 
-                <div class="history-section">
-                    <div class="section-header-title">TRANSACTION & ACCOUNT HISTORY</div>
-                    <div class="history-table-container">
-                        ${user.history.length === 0 ? '<div class="history-row"><div class="history-title" style="color:var(--text-muted)">No history recorded</div></div>' : ''}
-                        ${user.history.map(item => `
-                            <div class="history-row">
-                                <div class="history-info">
-                                    <div class="history-title">${item.type}</div>
-                                    <div class="history-date">${item.date}</div>
-                                </div>
-                                <div class="history-amount ${item.amount > 0 ? 'amount-positive' : item.amount < 0 ? 'amount-negative' : ''}">
-                                    ${item.amount ? (item.amount >= 0 ? '+' : '') + formatMoney(item.amount) : ''}
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
+function openSimulateModal() {
+  document.getElementById('simulate-modal').classList.add('active');
+}
 
-                <div class="danger-zone-card">
-                    <div>
-                        <div class="danger-info-title">DANGER ZONE</div>
-                        <div class="danger-info-desc">Permanently remove this user account and erase all historical balances.</div>
-                    </div>
-                    <button class="btn-action btn-action-danger" onclick="deleteUserAccount(${user.id})">Delete account permanently</button>
-                </div>
-            `;
-        }
+function submitSimulate(type) {
+  if (!selectedUser || !allUsers[selectedUser]) return;
+  const data = allUsers[selectedUser];
+  const txDesc = type === 'login' ? 'Player login simulation' : 'Player logout simulation';
+  const txs = data.transactions || [];
+  txs.push({ desc: txDesc, amount: 0, date: Date.now() });
+  window.db.ref('users/' + selectedUser).update({
+    transactions: txs
+  }).then(() => {
+    closeModal('simulate-modal');
+    showToast('Simulation added!', 'success');
+  }).catch(() => showToast('Simulation failed', 'error'));
+}
 
-        function updateLiveUI() {
-            users.forEach(u => {
-                const sidebarEl = document.getElementById(`sidebar-bal-${u.id}`);
-                if (sidebarEl) sidebarEl.innerText = formatMoney(u.balance);
-            });
+function openDeleteUserModal() {
+  if (!selectedUser) return;
+  document.getElementById('delete-username').textContent = selectedUser;
+  document.getElementById('delete-user-modal').classList.add('active');
+}
 
-            if (selectedUserId) {
-                const user = users.find(u => u.id === selectedUserId);
-                if (user) {
-                    const headerBal = document.getElementById("live-header-bal");
-                    const cardBal = document.getElementById("live-card-bal");
-                    const cardEarned = document.getElementById("live-card-earned");
+function submitDeleteUser() {
+  if (!selectedUser) return;
+  window.db.ref('users/' + selectedUser).remove().then(() => {
+    closeModal('delete-user-modal');
+    selectedUser = null;
+    document.getElementById('empty-state').classList.remove('hidden');
+    document.getElementById('user-details').classList.add('hidden');
+    showToast('User deleted!', 'success');
+  }).catch(() => showToast('Delete failed', 'error'));
+}
 
-                    if (headerBal) headerBal.innerText = formatMoney(user.balance);
-                    if (cardBal) cardBal.innerText = formatMoney(user.balance);
-                    if (cardEarned) cardEarned.innerText = formatMoney(user.totalEarned);
-                }
-            }
-        }
+function openAdminSettings() {
+  clearError('pwd-error');
+  document.getElementById('old-password').value = '';
+  document.getElementById('new-admin-password').value = '';
+  const theme = localStorage.getItem(LS_ADMIN_THEME) || 'dark-blue';
+  document.querySelectorAll('.theme-option').forEach(el => {
+    if (el.classList.contains('theme-opt-' + theme)) el.classList.add('active');
+    else el.classList.remove('active');
+  });
+  document.getElementById('admin-settings-modal').classList.add('active');
+}
 
-        function openModal(id) {
-            document.getElementById(id).classList.add("active");
-        }
+function openCreateUserModal() {
+  clearError('create-error');
+  document.getElementById('create-username').value = '';
+  document.getElementById('create-password').value = '';
+  document.getElementById('create-rate').value = '';
+  document.getElementById('create-user-modal').classList.add('active');
+}
 
-        function closeModal(id) {
-            document.getElementById(id).classList.remove("active");
-        }
+function submitChangeAdminPassword() {
+  const oldP = document.getElementById('old-password').value;
+  const newP = document.getElementById('new-admin-password').value;
+  clearError('pwd-error');
+  if (!oldP || !newP) { showError('pwd-error', 'Fill in all fields'); return; }
+  const savedPass = localStorage.getItem(LS_ADMIN_PASS) || DEFAULT_ADMIN_PASS;
+  if (oldP !== savedPass) { showError('pwd-error', 'Current password incorrect'); return; }
+  if (newP.length < 4) { showError('pwd-error', 'Password min. 4 characters'); return; }
+  localStorage.setItem(LS_ADMIN_PASS, newP);
+  closeModal('admin-settings-modal');
+  showToast('Admin password updated!', 'success');
+}
 
-        function showCustomAlert(title, message) {
-            document.getElementById('customModalTitle').textContent = title || "Сповіщення";
-            document.getElementById('customModalText').textContent = message;
-            document.getElementById('customModalActions').innerHTML = `
-                <button class="btn-action btn-action-purple" onclick="closeModal('customAlertModal')">Зрозуміло</button>
-            `;
-            openModal('customAlertModal');
-        }
+function submitCreateUser() {
+  const username = document.getElementById('create-username').value.trim();
+  const password = document.getElementById('create-password').value;
+  const rate = parseFloat(document.getElementById('create-rate').value) || 0;
+  clearError('create-error');
 
-        function showCustomConfirm(title, message, onConfirm) {
-            document.getElementById('customModalTitle').textContent = title || "Підтвердження";
-            document.getElementById('customModalText').textContent = message;
-            document.getElementById('customModalActions').innerHTML = `
-                <button class="btn-action btn-action-outline" onclick="closeModal('customAlertModal')">Скасувати</button>
-                <button class="btn-action btn-action-danger" id="confirmDialogBtn">Підтвердити</button>
-            `;
-            document.getElementById('confirmDialogBtn').onclick = function() {
-                closeModal('customAlertModal');
-                onConfirm();
-            };
-            openModal('customAlertModal');
-        }
+  if (!username) { showError('create-error', 'Enter username'); return; }
+  if (username.length < 2) { showError('create-error', 'Username min. 2 characters'); return; }
+  if (!password) { showError('create-error', 'Enter password'); return; }
+  if (password.length < 4) { showError('create-error', 'Password min. 4 characters'); return; }
+  if (allUsers[username]) { showError('create-error', 'Username already exists'); return; }
 
-        function submitBalanceUpdate() {
-            const amount = parseFloat(document.getElementById("balanceAmountInput").value);
-            const note = document.getElementById("balanceNoteInput").value || (amount >= 0 ? "Admin Deposit" : "Admin Withdrawal");
+  const userData = {
+    password: password,
+    balance: 0,
+    hourlyRate: rate,
+    lifetimeEarned: 0,
+    transactions: [],
+    createdAt: Date.now(),
+    lastRateSetAt: Date.now()
+  };
 
-            if (isNaN(amount)) {
-                showCustomAlert("Помилка", "Будь ласка, введіть коректну числову суму");
-                return;
-            }
+  window.db.ref('users/' + username).set(userData).then(() => {
+    closeModal('create-user-modal');
+    showToast('User created successfully!', 'success');
+    selectUser(username);
+  }).catch(() => {
+    showError('create-error', 'Creation failed');
+  });
+}
 
-            const user = users.find(u => u.id === selectedUserId);
-            if (user) {
-                user.balance += amount;
-                if (amount > 0) user.totalEarned += amount;
+document.getElementById('users-search').addEventListener('input', renderUsersList);
 
-                // Record globally and locally
-                recordMovement(user.name, `Зміна балансу адміном: ${note}`, amount);
+(function checkSession() {
+  if (localStorage.getItem(LS_ADMIN_SESSION) === 'true') {
+    document.getElementById('login-screen').classList.add('hidden');
+    setTimeout(() => {
+      if (window.db) {
+        document.getElementById('admin-screen').classList.remove('hidden');
+        loadUsers();
+      }
+    }, 500);
+  }
+})();
 
-                renderSidebar();
-                renderWorkspace();
-                closeModal("balanceModal");
-            }
-        }
-
-        function submitRateUpdate() {
-            const newRate = parseFloat(document.getElementById("rateAmountInput").value);
-
-            if (isNaN(newRate) || newRate < 0) {
-                showCustomAlert("Помилка", "Введіть коректну невід'ємну ставку");
-                return;
-            }
-
-            const user = users.find(u => u.id === selectedUserId);
-            if (user) {
-                user.rate = newRate;
-                recordMovement(user.name, `Зміна ставки адміном на $${formatMoney(newRate)}/год`, null);
-                renderWorkspace();
-                closeModal("rateModal");
-            }
-        }
-
-        function resetUserBalance(id) {
-            showCustomConfirm("Скидання балансу", "Ви впевнені, що хочете скинути баланс цього користувача до 0?", () => {
-                const user = users.find(u => u.id === id);
-                if (user) {
-                    const oldBal = user.balance;
-                    user.balance = 0;
-                    recordMovement(user.name, "Скидання балансу адміном", -oldBal);
-                    renderSidebar();
-                    renderWorkspace();
-                }
-            });
-        }
-
-        function deleteUserAccount(id) {
-            showCustomConfirm("Видалення акаунту", "УВАГА: Це незворотна дія. Видалити акаунт та весь його баланс?", () => {
-                const user = users.find(u => u.id === id);
-                if (user) {
-                    recordMovement(user.name, "Акаунт видалено адміном", null);
-                }
-                users = users.filter(u => u.id !== id);
-                selectedUserId = null;
-                saveData();
-                renderSidebar();
-                renderWorkspace();
-            });
-        }
-
-        function openNewUserModal() {
-            openModal("newUserModal");
-        }
-
-        function submitCreateUser() {
-            const name = document.getElementById("newUsernameInput").value.trim();
-            const initBal = parseFloat(document.getElementById("newInitialBalanceInput").value) || 0;
-            const initRate = parseFloat(document.getElementById("newInitialRateInput").value) || 0;
-
-            if (!name) {
-                showCustomAlert("Помилка", "Ім'я користувача обов'язкове");
-                return;
-            }
-
-            const newUser = {
-                id: Date.now(),
-                name: name,
-                balance: initBal,
-                totalEarned: initBal,
-                rate: initRate,
-                created: new Date().toLocaleString('en-GB'),
-                history: []
-            };
-
-            users.push(newUser);
-            recordMovement(name, "Створено новий акаунт", initBal > 0 ? initBal : null);
-            selectUser(newUser.id);
-            closeModal("newUserModal");
-        }
-
-        function showToast(msg) {
-            const container = document.getElementById("toastContainer");
-            const toast = document.createElement("div");
-            toast.className = "toast";
-            toast.innerHTML = `<span>⚡</span> <span>${msg}</span>`;
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.remove();
-            }, 3000);
-        }
-
-        window.addEventListener("DOMContentLoaded", initApp);
-    </script>
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('active');
+});
+</script>
 </body>
 </html>
