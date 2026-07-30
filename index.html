@@ -3,13 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Payroll — Admin Panel</title>
+<title>Payroll — User Portal Pro</title>
 
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
+  /* ==========================================
+     1. COLOR THEMES DEFINITIONS
+     ========================================== */
+  
   [data-theme="dark-blue"] {
     --bg-main: #0a0c10;
     --bg-card: #12161f;
@@ -17,9 +24,11 @@
     --bg-input: #0a0d14;
     --border-color: #202736;
     --border-focus: #3b82f6;
+    
     --text-primary: #f3f4f6;
     --text-secondary: #9ca3af;
     --text-muted: #6b7280;
+    
     --accent-primary: #3b82f6;
     --accent-glow: rgba(59, 130, 246, 0.18);
     --positive-green: #10b981;
@@ -36,9 +45,11 @@
     --bg-input: #040e0a;
     --border-color: #17382a;
     --border-focus: #10b981;
+    
     --text-primary: #ecfdf5;
     --text-secondary: #a7f3d0;
     --text-muted: #059669;
+    
     --accent-primary: #10b981;
     --accent-glow: rgba(16, 185, 129, 0.22);
     --positive-green: #34d399;
@@ -55,9 +66,11 @@
     --bg-input: #090712;
     --border-color: #2a204d;
     --border-focus: #8b5cf6;
+    
     --text-primary: #f5f3ff;
     --text-secondary: #ddd6fe;
     --text-muted: #8b5cf6;
+    
     --accent-primary: #8b5cf6;
     --accent-glow: rgba(139, 92, 246, 0.25);
     --positive-green: #10b981;
@@ -74,9 +87,11 @@
     --bg-input: #0d0806;
     --border-color: #3b251e;
     --border-focus: #f97316;
+    
     --text-primary: #fff7ed;
     --text-secondary: #ffedd5;
     --text-muted: #c2410c;
+    
     --accent-primary: #f97316;
     --accent-glow: rgba(249, 115, 22, 0.22);
     --positive-green: #10b981;
@@ -93,9 +108,11 @@
     --bg-input: #f8fafc;
     --border-color: #cbd5e1;
     --border-focus: #2563eb;
+    
     --text-primary: #0f172a;
     --text-secondary: #475569;
     --text-muted: #64748b;
+    
     --accent-primary: #2563eb;
     --accent-glow: rgba(37, 99, 235, 0.15);
     --positive-green: #059669;
@@ -105,11 +122,15 @@
     --warning-yellow: #d97706;
   }
 
+  /* ==========================================
+     2. GLOBAL CORE STYLES
+     ========================================== */
   :root {
     --radius-sm: 8px;
     --radius-md: 14px;
     --radius-lg: 20px;
     --radius-full: 9999px;
+    
     --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
     --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-smooth: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -128,34 +149,61 @@
     font-family: var(--font-family);
     min-height: 100vh;
     display: flex;
-    padding: 12px;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 24px 12px;
     line-height: 1.5;
     transition: background-color var(--transition-smooth), color var(--transition-smooth);
   }
 
   .app-container {
     width: 100%;
-    max-width: 1400px;
+    max-width: 520px;
     margin: 0 auto;
-    display: grid;
-    grid-template-columns: 320px 1fr;
-    gap: 16px;
+    position: relative;
   }
 
-  .hidden { display: none !important; }
+  .hidden {
+    display: none !important;
+  }
+
+  .screen {
+    animation: slideUpFade 0.4s var(--transition-smooth) forwards;
+  }
+
+  @keyframes slideUpFade {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 
   .card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     padding: 22px;
+    margin-bottom: 16px;
     box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4);
+    transition: transform var(--transition-fast), border-color var(--transition-fast), background-color var(--transition-smooth);
+  }
+
+  .card-clickable {
+    cursor: pointer;
+  }
+  .card-clickable:hover {
+    border-color: var(--border-focus);
+    transform: translateY(-2px);
   }
 
   .label {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 8px;
@@ -205,7 +253,6 @@
     font-weight: 600;
     cursor: pointer;
     transition: all var(--transition-fast);
-    width: 100%;
   }
 
   .btn:hover {
@@ -213,7 +260,9 @@
     border-color: var(--border-focus);
   }
 
-  .btn:active { transform: scale(0.98); }
+  .btn:active {
+    transform: scale(0.98);
+  }
 
   .btn-primary {
     background: var(--accent-primary);
@@ -232,15 +281,17 @@
     color: var(--text-primary);
   }
 
-  .btn-danger {
-    background: var(--danger-red);
-    border-color: var(--danger-red);
-    color: #ffffff;
+  .btn-link {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 13px;
+    text-decoration: none;
+    cursor: pointer;
   }
-
-  .btn-danger:hover {
-    filter: brightness(1.1);
-    box-shadow: 0 4px 20px var(--danger-glow);
+  .btn-link:hover {
+    color: var(--text-secondary);
+    text-decoration: underline;
   }
 
   .error-msg {
@@ -250,236 +301,82 @@
     min-height: 20px;
   }
 
-  .sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .admin-header {
+  .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px;
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-  }
-
-  .admin-logo {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 700;
-    font-size: 16px;
-  }
-
-  .admin-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: var(--radius-md);
-    background: linear-gradient(135deg, #8b5cf6, #3b82f6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-  }
-
-  .admin-btn {
-    padding: 8px 12px;
-    background: transparent;
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    font-weight: 600;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all var(--transition-fast);
-  }
-
-  .admin-btn:hover {
-    background: var(--bg-card-hover);
-    border-color: var(--accent-primary);
-  }
-
-  .users-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    max-height: calc(100vh - 200px);
-    overflow-y: auto;
-  }
-
-  .user-item {
-    padding: 14px 16px;
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    font-weight: 600;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .user-item:hover {
-    border-color: var(--border-focus);
-    background: var(--bg-card-hover);
-  }
-
-  .user-item.active {
-    border-color: var(--accent-primary);
-    background: var(--accent-glow);
-  }
-
-  .user-avatar-small {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: var(--accent-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    color: #fff;
-    font-weight: 700;
-    margin-right: 8px;
-  }
-
-  .empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 200px;
-    text-align: center;
-    color: var(--text-muted);
-    font-size: 14px;
-  }
-
-  .main-content {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .user-header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
     margin-bottom: 20px;
   }
 
-  .user-info-left {
-    display: flex;
+  .user-chip {
+    display: inline-flex;
     align-items: center;
-    gap: 14px;
+    gap: 10px;
+    padding: 8px 16px;
+    border-radius: var(--radius-full);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .user-chip:hover {
+    border-color: var(--accent-primary);
+    background: var(--bg-card-hover);
+    box-shadow: 0 0 15px var(--accent-glow);
   }
 
   .user-avatar {
-    width: 50px;
-    height: 50px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     background: var(--accent-primary);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 12px;
     color: #fff;
     font-weight: 700;
   }
 
-  .user-meta {
+  .balance-wrap {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    align-items: baseline;
+    gap: 12px;
+    margin: 8px 0;
   }
 
-  .user-name {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text-primary);
-    cursor: pointer;
-    padding: 4px 8px;
-    border-radius: var(--radius-md);
-    transition: all var(--transition-fast);
-  }
-
-  .user-name:hover {
-    background: var(--bg-input);
-    color: var(--accent-primary);
-  }
-
-  .user-created {
-    font-size: 13px;
-    color: var(--text-muted);
-  }
-
-  .live-balance-top {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 4px;
-  }
-
-  .live-label {
-    font-size: 11px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .live-amount {
-    font-size: 24px;
+  .balance {
+    font-size: 38px;
     font-weight: 800;
+    letter-spacing: -0.02em;
     font-variant-numeric: tabular-nums;
-    color: var(--text-primary);
-  }
-
-  .balance-cards {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 20px;
-  }
-
-  .balance-card {
-    background: var(--bg-input);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    height: 120px;
-    justify-content: space-between;
-  }
-
-  .balance-card-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    line-height: 1.1;
   }
 
   .live-badge {
     font-size: 11px;
     font-weight: 700;
     color: var(--positive-green);
+    background: var(--positive-glow);
+    border: 1px solid var(--positive-green);
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
   .live-dot {
-    width: 5px;
-    height: 5px;
+    width: 6px;
+    height: 6px;
     background: var(--positive-green);
     border-radius: 50%;
-    box-shadow: 0 0 6px var(--positive-green);
+    box-shadow: 0 0 8px var(--positive-green);
     animation: pulse 1.5s infinite;
   }
 
@@ -488,100 +385,31 @@
     50% { opacity: 0.4; transform: scale(0.85); }
   }
 
-  .balance-amount {
-    font-size: 28px;
-    font-weight: 800;
-    font-variant-numeric: tabular-nums;
-    color: var(--text-primary);
-  }
-
   .rate-box {
-    background: var(--bg-input);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    padding: 20px;
-    margin-bottom: 20px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    gap: 20px;
-  }
-
-  .rate-info {
-    flex: 1;
-  }
-
-  .rate-label {
-    font-size: 12px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 8px;
+    justify-content: space-between;
+    background: var(--positive-glow);
+    border: 1px solid var(--positive-green);
   }
 
   .rate-value {
     font-size: 20px;
     font-weight: 700;
+    color: var(--positive-green);
     font-variant-numeric: tabular-nums;
-    color: var(--accent-primary);
-    margin-bottom: 4px;
   }
 
-  .rate-value::before {
-    content: '$ ';
-  }
-
-  .rate-period {
-    font-size: 13px;
-    color: var(--text-muted);
-  }
-
-  .rate-box .btn {
-    flex-shrink: 0;
-    width: auto;
-    padding: 12px 24px;
-  }
-
-  .actions-label {
-    font-size: 12px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 12px;
-    margin-left: 0;
-  }
-
-  .actions-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 24px;
-  }
-
-  .actions-grid .btn {
+  .chart-container {
+    position: relative;
+    height: 220px;
     width: 100%;
-  }
-
-  .tx-label {
-    font-size: 12px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 12px;
-    margin-left: 0;
-  }
-
-  .tx-container {
-    background: var(--bg-input);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    padding: 16px;
   }
 
   .tx-row {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     padding: 14px 0;
     border-bottom: 1px solid var(--border-color);
   }
@@ -590,33 +418,74 @@
     border-bottom: none;
   }
 
-  .tx-info {
-    flex: 1;
-  }
-
-  .tx-desc {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 2px;
-  }
-
-  .tx-date {
-    font-size: 11px;
-    color: var(--text-muted);
-  }
-
   .tx-amount {
     font-weight: 700;
-    font-size: 14px;
+    font-size: 15px;
     font-variant-numeric: tabular-nums;
-    text-align: right;
-    white-space: nowrap;
   }
 
   .tx-amount.positive { color: var(--positive-green); }
   .tx-amount.negative { color: var(--danger-red); }
 
+  .tx-date {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .stat-card {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 14px;
+  }
+
+  .stat-val {
+    font-size: 18px;
+    font-weight: 700;
+    margin-top: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-top: 8px;
+    margin-bottom: 16px;
+  }
+
+  .theme-option {
+    height: 38px;
+    border-radius: var(--radius-md);
+    border: 2px solid transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+  }
+
+  .theme-option.active {
+    border-color: var(--text-primary) !important;
+    transform: scale(1.08);
+  }
+
+  .theme-opt-dark-blue { background: #3b82f6; border-color: #1d4ed8; }
+  .theme-opt-emerald { background: #10b981; border-color: #047857; }
+  .theme-opt-purple { background: #8b5cf6; border-color: #6d28d9; }
+  .theme-opt-amber { background: #f97316; border-color: #c2410c; }
+  .theme-opt-light { background: #e2e8f0; border-color: #94a3b8; }
+
+  /* ==========================================
+     3. MODALS & IN-APP CUSTOM NOTIFICATIONS
+     ========================================== */
   .modal-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -673,34 +542,41 @@
     cursor: pointer;
     line-height: 1;
   }
-
   .close-btn:hover { color: var(--text-primary); }
 
-  .theme-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-    margin-bottom: 20px;
+  .custom-alert-card {
+    text-align: center;
+    max-width: 380px;
   }
 
-  .theme-option {
-    height: 38px;
-    border-radius: var(--radius-md);
-    border: 2px solid transparent;
-    cursor: pointer;
-    transition: all var(--transition-fast);
+  .alert-icon-box {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 28px;
   }
 
-  .theme-option.active {
-    border-color: var(--text-primary) !important;
-    transform: scale(1.08);
+  .alert-icon-success {
+    background: var(--positive-glow);
+    color: var(--positive-green);
+    border: 2px solid var(--positive-green);
   }
 
-  .theme-opt-dark-blue { background: #3b82f6; }
-  .theme-opt-emerald { background: #10b981; }
-  .theme-opt-purple { background: #8b5cf6; }
-  .theme-opt-amber { background: #f97316; }
-  .theme-opt-light { background: #e2e8f0; }
+  .alert-icon-error {
+    background: var(--danger-glow);
+    color: var(--danger-red);
+    border: 2px solid var(--danger-red);
+  }
+
+  .alert-icon-info {
+    background: var(--accent-glow);
+    color: var(--accent-primary);
+    border: 2px solid var(--accent-primary);
+  }
 
   #toast-container {
     position: fixed;
@@ -723,6 +599,9 @@
     border-radius: var(--radius-md);
     padding: 12px 16px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    gap: 12px;
     animation: toastIn 0.3s var(--transition-smooth) forwards;
   }
 
@@ -734,471 +613,286 @@
     to { opacity: 1; transform: translateY(0) scale(1); }
   }
 
-  .modal-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-top: 20px;
-  }
-
-  .modal-buttons .btn {
-    width: 100%;
-  }
-
-  @media (max-width: 1023px) {
-    .app-container {
-      grid-template-columns: 1fr;
-    }
-
-    .users-list {
-      flex-direction: row;
-      max-height: 120px;
-      overflow-x: auto;
-    }
-
-    .user-item {
-      flex-shrink: 0;
-      min-width: 100px;
-      flex-direction: column;
-      text-align: center;
-    }
-
-    .user-avatar-small {
-      margin-right: 0;
-      width: 40px;
-      height: 40px;
-    }
-
-    .balance-cards {
-      grid-template-columns: 1fr;
-    }
-
-    .rate-box {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .rate-box .btn {
-      width: 100%;
-    }
-
-    .actions-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .user-header-top {
-      flex-direction: column;
-      gap: 12px;
-    }
+  .offline-banner {
+    background: var(--danger-red);
+    color: #ffffff;
+    text-align: center;
+    padding: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 2000;
+    display: none;
   }
 </style>
 </head>
 <body>
 
+<div class="offline-banner" id="offline-banner">Connection lost. Data may be outdated.</div>
+
 <div id="toast-container"></div>
 
-<!-- LOGIN SCREEN -->
-<div id="login-screen" style="width: 100%; max-width: 400px; margin: 0 auto; padding-top: 60px;">
-  <div class="card" style="text-align: center; padding: 48px 32px;">
-    <div style="font-size: 28px; font-weight: 800; margin-bottom: 12px;">Admin Panel</div>
-    <div class="label" style="text-transform: none; font-size: 14px; margin-bottom: 28px;">Enter admin password</div>
-    <input id="admin-password" type="password" class="input" placeholder="••••" style="margin-bottom: 12px;">
-    <div class="error-msg" id="login-error"></div>
-    <button class="btn btn-primary" onclick="adminLogin()">Login</button>
+<div class="modal-overlay" id="alert-modal">
+  <div class="modal-card custom-alert-card">
+    <div class="alert-icon-box" id="alert-icon-box">✓</div>
+    <div class="modal-title" id="alert-title" style="margin-bottom:8px;">Notification</div>
+    <div style="font-size:14px; color:var(--text-secondary); margin-bottom:20px;" id="alert-message">Message</div>
+    <button class="btn btn-primary" style="width:100%;" onclick="closeCustomAlert()">Got it</button>
   </div>
 </div>
 
-<!-- MAIN ADMIN SCREEN -->
-<div id="admin-screen" class="hidden">
-  <div class="app-container">
-    <!-- LEFT SIDEBAR -->
-    <div class="sidebar">
-      <div class="admin-header">
-        <div class="admin-logo">
-          <div class="admin-icon">⚡</div>
-          <span>Admin</span>
-        </div>
-        <button class="admin-btn" onclick="openAdminSettings()">⚙️</button>
-      </div>
+<div class="app-container">
 
-      <div style="display: flex; gap: 8px; margin-bottom: 4px;">
-        <button onclick="openCreateUserModal()" style="background: none; border: none; color: var(--text-primary); cursor: pointer; font-size: 14px; font-weight: 600; padding: 0;">+ Create User</button>
-        <span style="font-size: 11px; font-weight: 700; color: var(--accent-primary); background: var(--accent-glow); padding: 2px 8px; border-radius: var(--radius-full);">NEW</span>
-      </div>
-
-      <div class="card" style="padding: 12px; margin-bottom: 0;">
-        <input id="users-search" class="input" placeholder="Search users..." style="margin: 0;">
-      </div>
-
-      <div class="users-list" id="users-list"></div>
+  <!-- SCREEN 1: LOGIN USERNAME -->
+  <div id="login-screen" class="screen">
+    <div style="text-align:center; padding: 48px 0 32px;">
+      <div style="font-size:28px; font-weight:800; letter-spacing:-0.03em; margin-bottom:8px;">Payroll User Portal</div>
+      <div class="label" style="text-transform:none; font-size:14px;">Enter your username to access your portal</div>
     </div>
+    <div class="card">
+      <div class="label">Username</div>
+      <input id="login-username" class="input" placeholder="e.g. alex_dev" autocomplete="off">
+      <div class="error-msg" id="login-error"></div>
+      <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="onUsernameSubmit()">Continue</button>
+    </div>
+  </div>
 
-    <!-- MAIN CONTENT -->
-    <div class="main-content">
-      <div id="empty-state" class="card empty-state">
-        Select a user from the list
+  <!-- SCREEN 2: PASSWORD LOGIN / REGISTER -->
+  <div id="password-screen" class="screen hidden">
+    <div style="text-align:center; padding: 36px 0 24px;">
+      <div style="font-size:24px; font-weight:700; margin-bottom:6px;" id="password-title">Authorization</div>
+      <div class="label" style="text-transform:none; font-size:14px;" id="password-subtitle">Enter your password</div>
+    </div>
+    <div class="card">
+      <div id="existing-user-form">
+        <div class="label">Password</div>
+        <input id="existing-password" type="password" class="input" placeholder="••••••••" autocomplete="off">
+        <div class="error-msg" id="existing-error"></div>
+        <button class="btn btn-primary" style="width:100%; margin-top:12px;" onclick="onExistingLogin()">Log In</button>
       </div>
 
-      <div id="user-details" class="hidden">
-        <!-- USER HEADER -->
-        <div class="user-header-top">
-          <div class="user-info-left">
-            <div class="user-avatar" id="detail-avatar">U</div>
-            <div class="user-meta">
-              <div class="user-name" id="detail-username" onclick="showUserInfo()">username</div>
-              <div class="user-created" id="detail-created">Created: -</div>
-            </div>
-          </div>
-          <div class="live-balance-top">
-            <div class="live-label">LIVE BALANCE</div>
-            <div class="live-amount" id="detail-live-balance">0.00</div>
-          </div>
-        </div>
+      <div id="new-user-form" class="hidden">
+        <div class="label">Create a password</div>
+        <input id="new-password" type="password" class="input" placeholder="Minimum 4 characters" autocomplete="off">
+        <div style="margin-top:12px;"></div>
+        <div class="label">Confirm password</div>
+        <input id="new-password-confirm" type="password" class="input" placeholder="Repeat password" autocomplete="off">
+        <div class="error-msg" id="new-error"></div>
+        <button class="btn btn-primary" style="width:100%; margin-top:12px;" onclick="onCreateAccount()">Create Account</button>
+      </div>
 
-        <!-- BALANCE CARDS -->
-        <div class="balance-cards">
-          <div class="balance-card">
-            <div class="balance-card-label">
-              CURRENT BALANCE
-              <span class="live-badge"><span class="live-dot"></span>LIVE ACCRUAL</span>
-            </div>
-            <div class="balance-amount" id="detail-balance">0.00</div>
-          </div>
-          <div class="balance-card">
-            <div class="balance-card-label">TOTAL EARNED (ALL TIME)</div>
-            <div class="balance-amount" id="detail-lifetime">0.00</div>
-          </div>
-        </div>
-
-        <!-- HOURLY RATE -->
-        <div class="rate-box">
-          <div class="rate-info">
-            <div class="rate-label">Hourly Accrual Rate</div>
-            <div class="rate-value" id="detail-rate">0.00</div>
-            <div class="rate-period">/ hour</div>
-          </div>
-          <button class="btn btn-secondary" onclick="openChangeRateModal()">Change rate</button>
-        </div>
-
-        <!-- ACTIONS -->
-        <div class="actions-label">ACTIONS & SIMULATIONS</div>
-        <div class="actions-grid">
-          <button class="btn btn-primary" onclick="openUpdateBalanceModal()">Update balance</button>
-          <button class="btn btn-secondary" onclick="openSimulateModal()">🎲 Simulate</button>
-          <button class="btn btn-secondary" onclick="resetBalance()">Reset balance</button>
-        </div>
-
-        <!-- TRANSACTIONS -->
-        <div class="tx-label">TRANSACTION & ACCOUNT HISTORY</div>
-        <div class="tx-container" id="detail-transactions">
-          <div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 14px;">No transactions</div>
-        </div>
-
-        <!-- DELETE BUTTON -->
-        <div style="margin-top: 20px;">
-          <button class="btn btn-danger" onclick="openDeleteUserModal()">Delete Account</button>
-        </div>
+      <div style="text-align:center; margin-top:16px;">
+        <button class="btn-link" onclick="backToLogin()">Change username</button>
       </div>
     </div>
   </div>
-</div>
 
-<!-- MODALS -->
-<div class="modal-overlay" id="change-rate-modal">
-  <div class="modal-card">
-    <div class="modal-header">
-      <div class="modal-title">Change Hourly Rate</div>
-      <button class="close-btn" onclick="closeModal('change-rate-modal')">&times;</button>
+  <!-- SCREEN 3: MAIN DASHBOARD -->
+  <div id="main-screen" class="screen hidden">
+    <div class="header">
+      <div class="user-chip" id="user-chip" onclick="openProfileModal()">
+        <div class="user-avatar" id="avatar-initial">U</div>
+        <span id="user-name">User</span>
+      </div>
+      <button class="btn btn-secondary" style="padding: 8px 14px; font-size:13px;" onclick="doLogout()">Log Out</button>
     </div>
-    <div class="label">New Hourly Rate</div>
-    <input id="rate-input" type="number" class="input" placeholder="e.g. 100" step="0.01" style="margin-bottom: 12px;">
-    <div class="error-msg" id="rate-error"></div>
-    <div class="modal-buttons">
-      <button class="btn btn-secondary" onclick="closeModal('change-rate-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="submitChangeRate()">Update Rate</button>
+
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="label">Current Balance</div>
+        <span class="live-badge hidden" id="live-badge"><span class="live-dot"></span>Live</span>
+      </div>
+      <div class="balance-wrap">
+        <div class="balance" id="balance">0.00</div>
+      </div>
+    </div>
+
+    <div class="card rate-box">
+      <div>
+        <div class="label" style="margin-bottom:2px; color:var(--text-muted);">Hourly Rate</div>
+        <div class="rate-value" id="hourly-rate">0.00 / hr</div>
+      </div>
+      <div style="font-size:13px; font-weight:600; color:var(--text-muted);" id="rate-status">Inactive</div>
+    </div>
+
+    <div class="card">
+      <div class="label" style="margin-bottom:12px;">Balance Dynamics (All Time)</div>
+
+      <div class="chart-container">
+        <canvas id="balanceChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="label" style="margin-bottom:14px;">Account Statistics</div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="label" style="font-size:11px;">Total Earned</div>
+          <div class="stat-val" id="lifetime-earned" style="color:var(--positive-green);">0.00</div>
+        </div>
+        <div class="stat-card">
+          <div class="label" style="font-size:11px;">Speed / min</div>
+          <div class="stat-val" id="minutely-rate">0.00</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="label" style="margin-left:4px; margin-bottom:10px;">Transaction History</div>
+      <div class="card" id="tx-list" style="padding: 10px 20px;">
+        <div style="text-align:center; padding: 24px; color: var(--text-muted); font-size:14px;">No transactions yet</div>
+      </div>
     </div>
   </div>
+
 </div>
 
-<div class="modal-overlay" id="update-balance-modal">
+<div class="modal-overlay" id="profile-modal">
   <div class="modal-card">
     <div class="modal-header">
-      <div class="modal-title">Update Balance</div>
-      <button class="close-btn" onclick="closeModal('update-balance-modal')">&times;</button>
-    </div>
-    <div class="label">Amount</div>
-    <input id="update-amount" type="number" class="input" placeholder="e.g. 50" step="0.01" style="margin-bottom: 16px;">
-    <div class="error-msg" id="update-balance-error"></div>
-    <div class="modal-buttons">
-      <button class="btn btn-danger" onclick="submitUpdateBalance('subtract')">Subtract</button>
-      <button class="btn btn-primary" onclick="submitUpdateBalance('add')">Add</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="simulate-modal">
-  <div class="modal-card">
-    <div class="modal-header">
-      <div class="modal-title">Simulate Event</div>
-      <button class="close-btn" onclick="closeModal('simulate-modal')">&times;</button>
-    </div>
-    <p style="color: var(--text-secondary); margin-bottom: 16px;">Select a simulation type</p>
-    <div style="display: flex; flex-direction: column; gap: 8px;">
-      <button class="btn btn-secondary" onclick="submitSimulate('login')">Player Login</button>
-      <button class="btn btn-secondary" onclick="submitSimulate('logout')">Player Logout</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="delete-user-modal">
-  <div class="modal-card">
-    <div class="modal-header">
-      <div class="modal-title">Delete Account</div>
-      <button class="close-btn" onclick="closeModal('delete-user-modal')">&times;</button>
-    </div>
-    <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 20px;">
-      Are you sure you want to delete <strong id="delete-username">username</strong>? This action cannot be undone.
-    </div>
-    <div class="modal-buttons">
-      <button class="btn btn-secondary" onclick="closeModal('delete-user-modal')">Cancel</button>
-      <button class="btn btn-danger" onclick="submitDeleteUser()">Delete</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="admin-settings-modal">
-  <div class="modal-card">
-    <div class="modal-header">
-      <div class="modal-title">Admin Settings</div>
-      <button class="close-btn" onclick="closeModal('admin-settings-modal')">&times;</button>
+      <div class="modal-title">User Profile</div>
+      <button class="close-btn" onclick="closeProfileModal()">&times;</button>
     </div>
 
-    <div style="margin-bottom: 20px;">
+    <div style="text-align:center; margin-bottom: 20px;">
+      <div class="user-avatar" id="modal-avatar" style="width:54px; height:54px; font-size:22px; margin: 0 auto 10px;">U</div>
+      <div style="font-size:20px; font-weight:700;" id="modal-username">User</div>
+      <div style="font-size:13px; color: var(--text-muted);" id="modal-created-at">Account created: -</div>
+    </div>
+
+    <div style="margin-bottom: 16px;">
       <div class="label">App Theme</div>
       <div class="theme-grid">
-        <div class="theme-option theme-opt-dark-blue active" onclick="setAdminTheme('dark-blue', this)"></div>
-        <div class="theme-option theme-opt-emerald" onclick="setAdminTheme('emerald', this)"></div>
-        <div class="theme-option theme-opt-purple" onclick="setAdminTheme('purple', this)"></div>
-        <div class="theme-option theme-opt-amber" onclick="setAdminTheme('amber', this)"></div>
-        <div class="theme-option theme-opt-light" onclick="setAdminTheme('light', this)"></div>
+        <div class="theme-option theme-opt-dark-blue active" onclick="setAppTheme('dark-blue', this)" title="Dark Blue"></div>
+        <div class="theme-option theme-opt-emerald" onclick="setAppTheme('emerald', this)" title="Emerald"></div>
+        <div class="theme-option theme-opt-purple" onclick="setAppTheme('purple', this)" title="Cyberpunk"></div>
+        <div class="theme-option theme-opt-amber" onclick="setAppTheme('amber', this)" title="Amber"></div>
+        <div class="theme-option theme-opt-light" onclick="setAppTheme('light', this)" title="Light"></div>
       </div>
     </div>
 
-    <div style="border-top: 1px solid var(--border-color); padding-top: 16px; margin-bottom: 16px;">
-      <div class="label">Change Admin Password</div>
-      <input id="old-password" type="password" class="input" placeholder="Current password" style="margin-bottom: 8px;">
-      <input id="new-admin-password" type="password" class="input" placeholder="New password" style="margin-bottom: 12px;">
-      <div class="error-msg" id="pwd-error"></div>
-      <button class="btn btn-primary" onclick="submitChangeAdminPassword()">Update Password</button>
-    </div>
-
-    <div style="text-align: center;">
-      <button class="btn btn-secondary" onclick="adminLogout()">Logout</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="user-info-modal">
-  <div class="modal-card">
-    <div class="modal-header">
-      <div class="modal-title">User Information</div>
-      <button class="close-btn" onclick="closeModal('user-info-modal')">&times;</button>
-    </div>
-    <div style="text-align: center;">
-      <div class="user-avatar" id="info-avatar" style="width: 54px; height: 54px; font-size: 22px; margin: 0 auto 12px;">U</div>
-      <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px;" id="info-username">username</div>
-      <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;" id="info-created">Created: -</div>
-      <div style="text-align: left; background: var(--bg-input); padding: 14px; border-radius: var(--radius-md);">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-          <span style="color: var(--text-muted); font-size: 13px;">Current Balance:</span>
-          <span style="font-weight: 600; font-variant-numeric: tabular-nums;" id="info-balance">0.00</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-          <span style="color: var(--text-muted); font-size: 13px;">Total Earned:</span>
-          <span style="font-weight: 600; font-variant-numeric: tabular-nums;" id="info-lifetime">0.00</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-          <span style="color: var(--text-muted); font-size: 13px;">Hourly Rate:</span>
-          <span style="font-weight: 600; font-variant-numeric: tabular-nums;" id="info-rate">0.00</span>
-        </div>
-        <div style="display: flex; justify-content: space-between;">
-          <span style="color: var(--text-muted); font-size: 13px;">Total Transactions:</span>
-          <span style="font-weight: 600;" id="info-tx-count">0</span>
-        </div>
+    <div class="card" style="padding: 14px; margin-bottom: 16px; background: var(--bg-input);">
+      <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+        <span style="font-size:13px; color:var(--text-muted);">Account status:</span>
+        <span style="font-size:13px; font-weight:600; color:var(--positive-green);">Active</span>
+      </div>
+      <div style="display:flex; justify-content:space-between;">
+        <span style="font-size:13px; color:var(--text-muted);">Total transactions:</span>
+        <span style="font-size:13px; font-weight:600;" id="modal-tx-count">0</span>
       </div>
     </div>
-  </div>
-</div>
 
-<div class="modal-overlay" id="create-user-modal">
-  <div class="modal-card">
-    <div class="modal-header">
-      <div class="modal-title">Create New User</div>
-      <button class="close-btn" onclick="closeModal('create-user-modal')">&times;</button>
-    </div>
-    <div class="label">Username</div>
-    <input id="create-username" class="input" placeholder="e.g. alex_dev" style="margin-bottom: 12px;">
-    <div class="label">Initial Password</div>
-    <input id="create-password" type="password" class="input" placeholder="••••" style="margin-bottom: 12px;">
-    <div class="label">Initial Hourly Rate (Optional)</div>
-    <input id="create-rate" type="number" class="input" placeholder="e.g. 100" step="0.01" style="margin-bottom: 12px;">
-    <div class="error-msg" id="create-error"></div>
-    <div class="modal-buttons">
-      <button class="btn btn-secondary" onclick="closeModal('create-user-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="submitCreateUser()">Create User</button>
+    <div style="border-top: 1px solid var(--border-color); padding-top: 16px;">
+      <div class="label">Change Password</div>
+      <input id="pwd-old" type="password" class="input" placeholder="Current password" style="margin-bottom:8px;">
+      <input id="pwd-new" type="password" class="input" placeholder="New password">
+      <div class="error-msg" id="pwd-modal-error"></div>
+      <button class="btn btn-primary" style="width:100%; margin-top:8px;" onclick="onChangePassword()">Update Password</button>
     </div>
   </div>
 </div>
 
 <script>
-  setTimeout(() => {
-    const firebaseConfig = {
-      apiKey: "AIzaSyDHtCHRG9o1Alpa8qDgezcakfNdQogs-_w",
-      authDomain: "spookytime-a7302.firebaseapp.com",
-      databaseURL: "https://spookytime-a7302-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "spookytime-a7302",
-      storageBucket: "spookytime-a7302.firebasestorage.app",
-      messagingSenderId: "196885981587",
-      appId: "1:196885981587:web:4ebf769c820a740cb32066",
-      measurementId: "G-SYZJ94852S"
-    };
-    firebase.initializeApp(firebaseConfig);
-    window.db = firebase.database();
-  }, 500);
+const firebaseConfig = {
+    apiKey: "AIzaSyDHtCHRG9o1Alpa8qDgezcakfNdQogs-_w",
+    authDomain: "spookytime-a7302.firebaseapp.com",
+    databaseURL: "https://spookytime-a7302-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "spookytime-a7302",
+    storageBucket: "spookytime-a7302.firebasestorage.app",
+    messagingSenderId: "196885981587",
+    appId: "1:196885981587:web:4ebf769c820a740cb32066",
+    measurementId: "G-SYZJ94852S"
+};
 
-const LS_ADMIN_SESSION = 'payroll_admin_session';
-const LS_ADMIN_PASS = 'payroll_admin_password';
-const LS_ADMIN_THEME = 'payroll_admin_theme';
-const DEFAULT_ADMIN_PASS = '1111';
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-let selectedUser = null;
-let allUsers = {};
-let usersListener = null;
-let userDataListeners = {};
-let updateTimers = {};
+window.addEventListener('online', () => document.getElementById('offline-banner').style.display = 'none');
+window.addEventListener('offline', () => document.getElementById('offline-banner').style.display = 'block');
 
-function formatMoney(n) {
-  if (n === undefined || n === null || isNaN(n)) return '0.00';
-  return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
+const LS_SESSION_USER = 'payroll_user_session';
+const LS_SESSION_TIME = 'payroll_user_session_time';
+const LS_THEME_KEY = 'payroll_app_theme';
+const SESSION_MS = 24 * 60 * 60 * 1000;
 
-function formatMoneyShort(n) {
-  if (n === undefined || n === null || isNaN(n)) return '0.00';
-  const abs = Math.abs(n);
-  const sign = n < 0 ? '-' : '';
+let currentUser = null;
+let pendingUsername = null;
+let userListener = null;
+let currentData = null;
+let timerInterval = null;
+let chartInstance = null;
+let alertCallback = null;
+
+function showCustomAlert(title, message, type = 'success', callback = null) {
+  const modal = document.getElementById('alert-modal');
+  const iconBox = document.getElementById('alert-icon-box');
+  document.getElementById('alert-title').textContent = title;
+  document.getElementById('alert-message').textContent = message;
   
-  if (abs >= 1000000000) {
-    return sign + (abs / 1000000000).toFixed(2) + ' ккк';
-  } else if (abs >= 1000000) {
-    return sign + (abs / 1000000).toFixed(2) + ' кк';
-  } else if (abs >= 1000) {
-    return sign + (abs / 1000).toFixed(2) + ' к';
+  alertCallback = callback;
+
+  iconBox.className = 'alert-icon-box';
+  if (type === 'success') {
+    iconBox.classList.add('alert-icon-success');
+    iconBox.textContent = '✓';
+  } else if (type === 'error') {
+    iconBox.classList.add('alert-icon-error');
+    iconBox.textContent = '✕';
+  } else {
+    iconBox.classList.add('alert-icon-info');
+    iconBox.textContent = 'ℹ';
   }
-  return formatMoney(n);
+
+  modal.classList.add('active');
 }
 
-function formatDate(ts) {
-  if (!ts) return '-';
-  const d = new Date(ts);
-  return d.toLocaleDateString('en-US') + ' ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+function closeCustomAlert() {
+  document.getElementById('alert-modal').classList.remove('active');
+  if (alertCallback) {
+    alertCallback();
+    alertCallback = null;
+  }
 }
 
-function showToast(message, type = 'success') {
+function showToast(message, type = 'info') {
   const container = document.getElementById('toast-container');
   const toast = document.createElement('div');
   toast.className = `toast-item toast-${type}`;
-  toast.innerHTML = `<span>${message}</span>`;
+  toast.innerHTML = `<span style="font-weight:600; font-size:13px;">${message}</span>`;
+  
   container.appendChild(toast);
   setTimeout(() => {
     toast.style.opacity = '0';
     toast.style.transform = 'translateY(10px)';
+    toast.style.transition = 'all 0.3s ease';
     setTimeout(() => toast.remove(), 300);
   }, 3000);
 }
 
-function showError(id, msg) { document.getElementById(id).textContent = msg; }
-function clearError(id) { document.getElementById(id).textContent = ''; }
-function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function setAppTheme(themeName, element) {
+  document.documentElement.setAttribute('data-theme', themeName);
+  localStorage.setItem(LS_THEME_KEY, themeName);
 
-function setAdminTheme(theme, el) {
-  document.documentElement.setAttribute('data-theme', theme);
-  localStorage.setItem(LS_ADMIN_THEME, theme);
-  document.querySelectorAll('.theme-option').forEach(e => e.classList.remove('active'));
-  el.classList.add('active');
+  if (element) {
+    document.querySelectorAll('.theme-option').forEach(el => el.classList.remove('active'));
+    element.classList.add('active');
+  }
+
+  if (chartInstance) {
+    initChart();
+    updateChartData();
+  }
 }
 
 (function initTheme() {
-  const theme = localStorage.getItem(LS_ADMIN_THEME) || 'dark-blue';
-  document.documentElement.setAttribute('data-theme', theme);
+  const savedTheme = localStorage.getItem(LS_THEME_KEY) || 'dark-blue';
+  document.documentElement.setAttribute('data-theme', savedTheme);
 })();
 
-function adminLogin() {
-  if (!window.db) { showError('login-error', 'Firebase initializing...'); return; }
-  const pass = document.getElementById('admin-password').value;
-  clearError('login-error');
-  if (!pass) { showError('login-error', 'Enter password'); return; }
-  const savedPass = localStorage.getItem(LS_ADMIN_PASS) || DEFAULT_ADMIN_PASS;
-  if (pass !== savedPass) { showError('login-error', 'Incorrect password'); return; }
-  localStorage.setItem(LS_ADMIN_SESSION, 'true');
-  document.getElementById('login-screen').classList.add('hidden');
-  document.getElementById('admin-screen').classList.remove('hidden');
-  document.getElementById('admin-password').value = '';
-  loadUsers();
-}
-
-function adminLogout() {
-  localStorage.removeItem(LS_ADMIN_SESSION);
-  if (usersListener) usersListener.off();
-  Object.values(userDataListeners).forEach(l => l.off());
-  Object.values(updateTimers).forEach(t => clearInterval(t));
-  document.getElementById('admin-screen').classList.add('hidden');
-  document.getElementById('login-screen').classList.remove('hidden');
-  closeModal('admin-settings-modal');
-}
-
-function loadUsers() {
-  if (!window.db) return;
-  if (usersListener) usersListener.off();
-  usersListener = window.db.ref('users');
-  usersListener.on('value', snapshot => {
-    allUsers = snapshot.val() || {};
-    renderUsersList();
-  });
-}
-
-function renderUsersList() {
-  const search = document.getElementById('users-search').value.toLowerCase();
-  const usernames = Object.keys(allUsers).filter(u => u.toLowerCase().includes(search));
-  document.getElementById('users-list').innerHTML = usernames.map(u => `
-    <div class="user-item ${selectedUser === u ? 'active' : ''}" onclick="selectUser('${u}')">
-      <div class="user-avatar-small">${u.charAt(0).toUpperCase()}</div>
-      <div>${u}</div>
-    </div>
-  `).join('');
-}
-
-function selectUser(username) {
-  selectedUser = username;
-  renderUsersList();
-  showUserDetails(username);
-  startUserUpdateTimer(username);
-}
-
-function showUserDetails(username) {
-  if (!allUsers[username]) return;
-  document.getElementById('empty-state').classList.add('hidden');
-  document.getElementById('user-details').classList.remove('hidden');
-  const initial = username.charAt(0).toUpperCase();
-  document.getElementById('detail-avatar').textContent = initial;
-  document.getElementById('detail-username').textContent = username;
-  if (!userDataListeners[username]) {
-    userDataListeners[username] = window.db.ref('users/' + username);
-    userDataListeners[username].on('value', snapshot => {
-      const data = snapshot.val();
-      if (data) updateUserDetailsDisplay(username, data);
-    });
-  }
-  updateUserDetailsDisplay(username, allUsers[username]);
+function formatMoney(n) {
+  if (n === undefined || n === null || isNaN(n)) return '0.00';
+  return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function getCurrentBalance(data) {
@@ -1206,7 +900,8 @@ function getCurrentBalance(data) {
   const baseBal = data.balance || 0;
   if (!data.hourlyRate || data.hourlyRate <= 0 || !data.lastRateSetAt) return Math.max(0, baseBal);
   const seconds = (Date.now() - data.lastRateSetAt) / 1000;
-  return Math.max(0, baseBal + (data.hourlyRate / 3600) * seconds);
+  const calculated = baseBal + (data.hourlyRate / 3600) * seconds;
+  return Math.max(0, calculated);
 }
 
 function getCurrentLifetimeEarned(data) {
@@ -1217,241 +912,438 @@ function getCurrentLifetimeEarned(data) {
   return Math.max(0, baseLifetime + (data.hourlyRate / 3600) * seconds);
 }
 
-function updateUserDetailsDisplay(username, data) {
-  const bal = getCurrentBalance(data);
-  const lifetime = getCurrentLifetimeEarned(data);
-  document.getElementById('detail-balance').textContent = formatMoney(bal);
-  document.getElementById('detail-lifetime').textContent = formatMoney(lifetime);
-  document.getElementById('detail-rate').textContent = formatMoney(data.hourlyRate || 0);
-  document.getElementById('detail-live-balance').textContent = formatMoney(bal);
-  document.getElementById('detail-created').textContent = 'Created: ' + formatDate(data.createdAt);
-  renderUserTransactions(data.transactions || []);
-}
+function getBalanceAtTimestamp(data, targetTime) {
+  if (!data) return 0;
+  const now = Date.now();
+  if (targetTime >= now) return getCurrentBalance(data);
 
-function renderUserTransactions(list) {
-  const container = document.getElementById('detail-transactions');
-  if (!list || list.length === 0) {
-    container.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-muted);">No transactions</div>';
-    return;
-  }
-  container.innerHTML = list.slice().reverse().map(tx => `
-    <div class="tx-row">
-      <div class="tx-info">
-        <div class="tx-desc">${tx.desc || 'Transaction'}</div>
-        <div class="tx-date">${formatDate(tx.date)}</div>
-      </div>
-      <div class="tx-amount ${tx.amount >= 0 ? 'positive' : 'negative'}">
-        ${tx.amount >= 0 ? '+' : ''}${formatMoneyShort(tx.amount)}
-      </div>
-    </div>
-  `).join('');
-}
+  let bal = data.balance || 0;
+  const rate = data.hourlyRate || 0;
+  const lastSet = data.lastRateSetAt || now;
 
-function startUserUpdateTimer(username) {
-  if (updateTimers[username]) clearInterval(updateTimers[username]);
-  updateTimers[username] = setInterval(() => {
-    if (selectedUser === username && allUsers[username]) {
-      const data = allUsers[username];
-      const bal = getCurrentBalance(data);
-      const lifetime = getCurrentLifetimeEarned(data);
-      document.getElementById('detail-balance').textContent = formatMoney(bal);
-      document.getElementById('detail-lifetime').textContent = formatMoney(lifetime);
-      document.getElementById('detail-live-balance').textContent = formatMoney(bal);
+  if (rate > 0) {
+    if (targetTime >= lastSet) {
+      const elapsed = (targetTime - lastSet) / 1000;
+      bal += (rate / 3600) * elapsed;
+    } else {
+      const diff = (lastSet - targetTime) / 1000;
+      bal -= (rate / 3600) * diff;
     }
-  }, 100);
+  }
+
+  return Math.max(0, bal);
 }
 
-function showUserInfo() {
-  if (!selectedUser || !allUsers[selectedUser]) return;
-  const data = allUsers[selectedUser];
-  const bal = getCurrentBalance(data);
-  const lifetime = getCurrentLifetimeEarned(data);
-  document.getElementById('info-avatar').textContent = selectedUser.charAt(0).toUpperCase();
-  document.getElementById('info-username').textContent = selectedUser;
-  document.getElementById('info-created').textContent = 'Created: ' + formatDate(data.createdAt);
-  document.getElementById('info-balance').textContent = formatMoney(bal);
-  document.getElementById('info-lifetime').textContent = formatMoney(lifetime);
-  document.getElementById('info-rate').textContent = formatMoney(data.hourlyRate || 0) + ' / hr';
-  document.getElementById('info-tx-count').textContent = (data.transactions || []).length;
-  document.getElementById('user-info-modal').classList.add('active');
+function formatDate(ts) {
+  if (!ts) return '-';
+  const d = new Date(ts);
+  return d.toLocaleDateString('en-US') + ' ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 }
 
-function openChangeRateModal() {
-  if (!selectedUser || !allUsers[selectedUser]) return;
-  clearError('rate-error');
-  document.getElementById('rate-input').value = allUsers[selectedUser].hourlyRate || 0;
-  document.getElementById('change-rate-modal').classList.add('active');
+function clearError(id) { document.getElementById(id).textContent = ''; }
+function showError(id, msg) { document.getElementById(id).textContent = msg; }
+function shakeInput(el) {
+  el.classList.add('input-error');
+  setTimeout(() => el.classList.remove('input-error'), 600);
 }
 
-function submitChangeRate() {
-  const amount = parseFloat(document.getElementById('rate-input').value);
-  clearError('rate-error');
-  if (isNaN(amount) || amount < 0) { showError('rate-error', 'Enter valid amount'); return; }
-  window.db.ref('users/' + selectedUser).update({
-    hourlyRate: amount,
-    lastRateSetAt: Date.now()
-  }).then(() => {
-    closeModal('change-rate-modal');
-    showToast('Hourly rate updated!', 'success');
-  }).catch(() => showError('rate-error', 'Update failed'));
+function hideAllScreens() {
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('password-screen').classList.add('hidden');
+  document.getElementById('main-screen').classList.add('hidden');
 }
 
-function openUpdateBalanceModal() {
-  clearError('update-balance-error');
-  document.getElementById('update-amount').value = '';
-  document.getElementById('update-balance-modal').classList.add('active');
+function showLogin() {
+  hideAllScreens();
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('login-username').value = '';
+  clearError('login-error');
 }
 
-function submitUpdateBalance(action) {
-  const amount = parseFloat(document.getElementById('update-amount').value);
-  clearError('update-balance-error');
-  if (isNaN(amount) || amount <= 0) { showError('update-balance-error', 'Enter valid amount'); return; }
-  if (!selectedUser || !allUsers[selectedUser]) return;
-  const data = allUsers[selectedUser];
-  const currentBal = getCurrentBalance(data);
-  const newBal = action === 'add' ? currentBal + amount : currentBal - amount;
-  if (newBal < 0) { showError('update-balance-error', 'Insufficient balance'); return; }
-  const txDesc = action === 'add' ? 'Admin added' : 'Admin subtracted';
-  const txs = data.transactions || [];
-  txs.push({ desc: txDesc, amount: action === 'add' ? amount : -amount, date: Date.now() });
-  window.db.ref('users/' + selectedUser).update({
-    balance: newBal,
-    lifetimeEarned: (data.lifetimeEarned || 0) + (action === 'add' ? amount : 0),
-    transactions: txs,
-    lastRateSetAt: Date.now()
-  }).then(() => {
-    closeModal('update-balance-modal');
-    showToast(action === 'add' ? 'Balance added!' : 'Balance subtracted!', 'success');
-  }).catch(() => showError('update-balance-error', 'Update failed'));
+function showPasswordScreen(username, isNew) {
+  hideAllScreens();
+  pendingUsername = username;
+  document.getElementById('password-screen').classList.remove('hidden');
+  clearError('existing-error');
+  clearError('new-error');
+
+  if (isNew) {
+    document.getElementById('password-title').textContent = 'Registration';
+    document.getElementById('password-subtitle').textContent = 'Create a password for ' + username;
+    document.getElementById('existing-user-form').classList.add('hidden');
+    document.getElementById('new-user-form').classList.remove('hidden');
+    document.getElementById('new-password').value = '';
+    document.getElementById('new-password-confirm').value = '';
+  } else {
+    document.getElementById('password-title').textContent = 'Welcome back';
+    document.getElementById('password-subtitle').textContent = 'Enter password for ' + username;
+    document.getElementById('existing-user-form').classList.remove('hidden');
+    document.getElementById('new-user-form').classList.add('hidden');
+    document.getElementById('existing-password').value = '';
+  }
 }
 
-function resetBalance() {
-  if (!selectedUser || !allUsers[selectedUser]) return;
-  const data = allUsers[selectedUser];
-  const currentBal = getCurrentBalance(data);
-  if (currentBal === 0) { showToast('Balance already 0', 'success'); return; }
-  window.db.ref('users/' + selectedUser).update({
-    balance: 0,
-    lastRateSetAt: Date.now()
-  }).then(() => showToast('Balance reset!', 'success')).catch(() => showToast('Reset failed', 'error'));
+function showMain(username) {
+  hideAllScreens();
+  currentUser = username;
+  document.getElementById('main-screen').classList.remove('hidden');
+  initChart();
+  startUserListener(username);
+  startLiveTimer();
 }
 
-function openSimulateModal() {
-  document.getElementById('simulate-modal').classList.add('active');
-}
-
-function submitSimulate(type) {
-  if (!selectedUser || !allUsers[selectedUser]) return;
-  const data = allUsers[selectedUser];
-  const txDesc = type === 'login' ? 'Player login simulation' : 'Player logout simulation';
-  const txs = data.transactions || [];
-  txs.push({ desc: txDesc, amount: 0, date: Date.now() });
-  window.db.ref('users/' + selectedUser).update({
-    transactions: txs
-  }).then(() => {
-    closeModal('simulate-modal');
-    showToast('Simulation added!', 'success');
-  }).catch(() => showToast('Simulation failed', 'error'));
-}
-
-function openDeleteUserModal() {
-  if (!selectedUser) return;
-  document.getElementById('delete-username').textContent = selectedUser;
-  document.getElementById('delete-user-modal').classList.add('active');
-}
-
-function submitDeleteUser() {
-  if (!selectedUser) return;
-  window.db.ref('users/' + selectedUser).remove().then(() => {
-    closeModal('delete-user-modal');
-    selectedUser = null;
-    document.getElementById('empty-state').classList.remove('hidden');
-    document.getElementById('user-details').classList.add('hidden');
-    showToast('User deleted!', 'success');
-  }).catch(() => showToast('Delete failed', 'error'));
-}
-
-function openAdminSettings() {
-  clearError('pwd-error');
-  document.getElementById('old-password').value = '';
-  document.getElementById('new-admin-password').value = '';
-  const theme = localStorage.getItem(LS_ADMIN_THEME) || 'dark-blue';
-  document.querySelectorAll('.theme-option').forEach(el => {
-    if (el.classList.contains('theme-opt-' + theme)) el.classList.add('active');
-    else el.classList.remove('active');
+function startUserListener(username) {
+  if (userListener) userListener.off();
+  userListener = db.ref('users/' + username);
+  userListener.on('value', snapshot => {
+    const data = snapshot.val();
+    if (!data) { doLogout(); return; }
+    currentData = data;
+    updateUI();
+  }, err => {
+    console.error('Firebase error:', err);
+    showError('login-error', 'Database connection error.');
   });
-  document.getElementById('admin-settings-modal').classList.add('active');
 }
 
-function openCreateUserModal() {
-  clearError('create-error');
-  document.getElementById('create-username').value = '';
-  document.getElementById('create-password').value = '';
-  document.getElementById('create-rate').value = '';
-  document.getElementById('create-user-modal').classList.add('active');
-}
+window.onUsernameSubmit = function() {
+  const input = document.getElementById('login-username');
+  const raw = input.value.trim();
+  clearError('login-error');
+  if (!raw) { showError('login-error', "Enter username"); shakeInput(input); return; }
+  if (raw.length < 2) { showError('login-error', "Username is too short"); shakeInput(input); return; }
 
-function submitChangeAdminPassword() {
-  const oldP = document.getElementById('old-password').value;
-  const newP = document.getElementById('new-admin-password').value;
-  clearError('pwd-error');
-  if (!oldP || !newP) { showError('pwd-error', 'Fill in all fields'); return; }
-  const savedPass = localStorage.getItem(LS_ADMIN_PASS) || DEFAULT_ADMIN_PASS;
-  if (oldP !== savedPass) { showError('pwd-error', 'Current password incorrect'); return; }
-  if (newP.length < 4) { showError('pwd-error', 'Password min. 4 characters'); return; }
-  localStorage.setItem(LS_ADMIN_PASS, newP);
-  closeModal('admin-settings-modal');
-  showToast('Admin password updated!', 'success');
-}
+  db.ref('users/' + raw).once('value')
+    .then(snapshot => showPasswordScreen(raw, !snapshot.exists()))
+    .catch(() => showError('login-error', 'Network error.'));
+};
 
-function submitCreateUser() {
-  const username = document.getElementById('create-username').value.trim();
-  const password = document.getElementById('create-password').value;
-  const rate = parseFloat(document.getElementById('create-rate').value) || 0;
-  clearError('create-error');
+window.onCreateAccount = function() {
+  const pass = document.getElementById('new-password').value;
+  const confirm = document.getElementById('new-password-confirm').value;
+  clearError('new-error');
 
-  if (!username) { showError('create-error', 'Enter username'); return; }
-  if (username.length < 2) { showError('create-error', 'Username min. 2 characters'); return; }
-  if (!password) { showError('create-error', 'Enter password'); return; }
-  if (password.length < 4) { showError('create-error', 'Password min. 4 characters'); return; }
-  if (allUsers[username]) { showError('create-error', 'Username already exists'); return; }
+  if (!pass) { showError('new-error', 'Enter password'); shakeInput(document.getElementById('new-password')); return; }
+  if (pass.length < 4) { showError('new-error', 'Password must contain min. 4 characters'); shakeInput(document.getElementById('new-password')); return; }
+  if (pass !== confirm) { showError('new-error', 'Passwords do not match'); shakeInput(document.getElementById('new-password-confirm')); return; }
 
   const userData = {
-    password: password,
+    password: pass,
     balance: 0,
-    hourlyRate: rate,
+    hourlyRate: 0,
     lifetimeEarned: 0,
     transactions: [],
     createdAt: Date.now(),
     lastRateSetAt: Date.now()
   };
 
-  window.db.ref('users/' + username).set(userData).then(() => {
-    closeModal('create-user-modal');
-    showToast('User created successfully!', 'success');
-    selectUser(username);
-  }).catch(() => {
-    showError('create-error', 'Creation failed');
+  db.ref('users/' + pendingUsername).set(userData)
+    .then(() => {
+      localStorage.setItem(LS_SESSION_USER, pendingUsername);
+      localStorage.setItem(LS_SESSION_TIME, Date.now().toString());
+      showMain(pendingUsername);
+      showToast('Account created successfully!', 'success');
+    })
+    .catch(() => showError('new-error', 'Account creation error.'));
+};
+
+window.onExistingLogin = function() {
+  const pass = document.getElementById('existing-password').value;
+  clearError('existing-error');
+  if (!pass) { showError('existing-error', 'Enter password'); shakeInput(document.getElementById('existing-password')); return; }
+
+  db.ref('users/' + pendingUsername).once('value')
+    .then(snapshot => {
+      const data = snapshot.val();
+      if (!data) { showError('existing-error', 'Account not found'); return; }
+      if (data.password !== pass) { showError('existing-error', 'Incorrect password'); shakeInput(document.getElementById('existing-password')); return; }
+      localStorage.setItem(LS_SESSION_USER, pendingUsername);
+      localStorage.setItem(LS_SESSION_TIME, Date.now().toString());
+      showMain(pendingUsername);
+      showToast('Login successful!', 'success');
+    })
+    .catch(() => showError('existing-error', 'Connection error.'));
+};
+
+window.backToLogin = function() { pendingUsername = null; showLogin(); };
+
+window.doLogout = function() {
+  if (userListener) { userListener.off(); userListener = null; }
+  currentUser = null; currentData = null;
+  if (timerInterval) clearInterval(timerInterval);
+  if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+  localStorage.removeItem(LS_SESSION_USER);
+  localStorage.removeItem(LS_SESSION_TIME);
+  showLogin();
+};
+
+function openProfileModal() {
+  if (!currentData || !currentUser) return;
+  document.getElementById('modal-username').textContent = currentUser;
+  document.getElementById('modal-avatar').textContent = currentUser.charAt(0).toUpperCase();
+  document.getElementById('modal-created-at').textContent = 'Account created: ' + formatDate(currentData.createdAt);
+  document.getElementById('modal-tx-count').textContent = (currentData.transactions || []).length;
+  clearError('pwd-modal-error');
+  document.getElementById('pwd-old').value = '';
+  document.getElementById('pwd-new').value = '';
+  
+  const currentTheme = localStorage.getItem(LS_THEME_KEY) || 'dark-blue';
+  document.querySelectorAll('.theme-option').forEach(el => {
+    if (el.classList.contains('theme-opt-' + currentTheme)) el.classList.add('active');
+    else el.classList.remove('active');
+  });
+
+  document.getElementById('profile-modal').classList.add('active');
+}
+
+function closeProfileModal() {
+  document.getElementById('profile-modal').classList.remove('active');
+}
+
+window.onChangePassword = function() {
+  const oldP = document.getElementById('pwd-old').value;
+  const newP = document.getElementById('pwd-new').value;
+  clearError('pwd-modal-error');
+
+  if (!oldP || !newP) {
+    showError('pwd-modal-error', 'Fill in all fields');
+    return;
+  }
+  if (oldP !== currentData.password) {
+    showError('pwd-modal-error', 'Current password is incorrect');
+    return;
+  }
+  if (newP.length < 4) {
+    showError('pwd-modal-error', 'New password min. 4 characters');
+    return;
+  }
+
+  db.ref('users/' + currentUser + '/password').set(newP)
+    .then(() => {
+      closeProfileModal();
+      showCustomAlert('Success!', 'Your password has been successfully updated.', 'success');
+    })
+    .catch(() => showError('pwd-modal-error', 'Error updating password'));
+};
+
+function updateUI() {
+  if (!currentData || !currentUser) return;
+
+  const initial = currentUser.charAt(0).toUpperCase();
+  document.getElementById('user-name').textContent = currentUser;
+  document.getElementById('avatar-initial').textContent = initial;
+
+  updateBalanceDisplay();
+
+  const hourly = currentData.hourlyRate || 0;
+  document.getElementById('hourly-rate').textContent = formatMoney(hourly) + ' / hr';
+  document.getElementById('minutely-rate').textContent = '+' + formatMoney(hourly / 60);
+
+  const status = document.getElementById('rate-status');
+  if (hourly > 0) {
+    status.textContent = 'Active';
+    status.style.color = 'var(--positive-green)';
+    document.getElementById('live-badge').classList.remove('hidden');
+  } else {
+    status.textContent = 'Inactive';
+    status.style.color = 'var(--text-muted)';
+    document.getElementById('live-badge').classList.add('hidden');
+  }
+
+  const liveEarned = getCurrentLifetimeEarned(currentData);
+  document.getElementById('lifetime-earned').textContent = formatMoney(liveEarned);
+
+  renderTransactions(currentData.transactions);
+  updateChartData();
+}
+
+function updateBalanceDisplay() {
+  if (!currentData) return;
+  const bal = getCurrentBalance(currentData);
+  const el = document.getElementById('balance');
+  el.textContent = formatMoney(bal);
+  el.style.color = 'var(--text-primary)';
+}
+
+function renderTransactions(list) {
+  const container = document.getElementById('tx-list');
+  if (!list || list.length === 0) {
+    container.innerHTML = '<div style="text-align:center; padding: 24px; color: var(--text-muted); font-size:14px;">No transactions yet</div>';
+    return;
+  }
+  container.innerHTML = list.slice().reverse().map(tx => `
+    <div class="tx-row">
+      <div>
+        <div style="font-size:14px; font-weight:600;">${tx.desc || 'Accrual'}</div>
+        <div class="tx-date">${formatDate(tx.date)}</div>
+      </div>
+      <div class="tx-amount ${tx.amount >= 0 ? 'positive' : 'negative'}">
+        ${tx.amount >= 0 ? '+' : ''}${formatMoney(tx.amount)}
+      </div>
+    </div>
+  `).join('');
+}
+
+function getComputedStyleProp(prop) {
+  return getComputedStyle(document.documentElement).getPropertyValue(prop).trim();
+}
+
+function initChart() {
+  const ctx = document.getElementById('balanceChart').getContext('2d');
+  if (chartInstance) chartInstance.destroy();
+
+  const accentColor = getComputedStyleProp('--accent-primary') || '#3b82f6';
+  const cardBg = getComputedStyleProp('--bg-card') || '#12161f';
+  const textPrimary = getComputedStyleProp('--text-primary') || '#f3f4f6';
+  const textMuted = getComputedStyleProp('--text-muted') || '#6b7280';
+  const borderColor = getComputedStyleProp('--border-color') || '#202736';
+
+  const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+  gradient.addColorStop(0, accentColor + '44');
+  gradient.addColorStop(1, accentColor + '00');
+
+  chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'Balance',
+        data: [],
+        borderColor: accentColor,
+        borderWidth: 2.5,
+        backgroundColor: gradient,
+        fill: true,
+        tension: 0.35,
+        pointRadius: 0,
+        pointHoverRadius: 6,
+        pointHoverBackgroundColor: accentColor,
+        pointHoverBorderColor: '#ffffff',
+        pointHoverBorderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        duration: 400,
+        easing: 'easeOutQuart'
+      },
+      interaction: {
+        intersect: false,
+        mode: 'index',
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: cardBg,
+          titleColor: textMuted,
+          bodyColor: textPrimary,
+          borderColor: borderColor,
+          borderWidth: 1,
+          padding: 10,
+          displayColors: false,
+          callbacks: {
+            label: function(context) {
+              return 'Balance: ' + formatMoney(context.parsed.y);
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(255, 255, 255, 0.04)' },
+          ticks: { color: textMuted, font: { size: 10 } }
+        },
+        y: {
+          beginAtZero: false,
+          grid: { color: 'rgba(255, 255, 255, 0.04)' },
+          ticks: {
+            color: textMuted,
+            font: { size: 10 },
+            callback: val => formatMoney(val)
+          }
+        }
+      }
+    }
   });
 }
 
-document.getElementById('users-search').addEventListener('input', renderUsersList);
+function updateChartData() {
+  if (!chartInstance || !currentData) return;
+
+  const now = Date.now();
+  const startTime = currentData.createdAt || (now - 7 * 24 * 60 * 60 * 1000);
+  const pointsCount = 30;
+
+  const step = (now - startTime) / pointsCount;
+  const labels = [];
+  const points = [];
+
+  for (let i = 0; i <= pointsCount; i++) {
+    const t = startTime + step * i;
+    const d = new Date(t);
+    labels.push(d.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit' }));
+    points.push(getBalanceAtTimestamp(currentData, t));
+  }
+
+  chartInstance.data.labels = labels;
+  chartInstance.data.datasets[0].data = points;
+
+  const minVal = Math.min(...points);
+  const maxVal = Math.max(...points);
+  const diff = maxVal - minVal;
+  const padding = diff > 0 ? diff * 0.15 : (minVal || 1) * 0.001;
+
+  chartInstance.options.scales.y.min = Math.max(0, minVal - padding);
+  chartInstance.options.scales.y.max = maxVal + padding;
+
+  chartInstance.update();
+}
+
+function startLiveTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  
+  let chartRefreshCounter = 0;
+
+  timerInterval = setInterval(() => {
+    updateBalanceDisplay();
+
+    if (chartInstance && currentData) {
+      const currentVal = getCurrentBalance(currentData);
+      const dataArr = chartInstance.data.datasets[0].data;
+
+      if (dataArr.length > 0) {
+        dataArr[dataArr.length - 1] = currentVal;
+
+        const minVal = Math.min(...dataArr);
+        const maxVal = Math.max(...dataArr);
+        const diff = maxVal - minVal;
+        const padding = diff > 0 ? diff * 0.15 : (minVal || 1) * 0.001;
+
+        chartInstance.options.scales.y.min = Math.max(0, minVal - padding);
+        chartInstance.options.scales.y.max = maxVal + padding;
+
+        chartInstance.update('none');
+      }
+    }
+
+    chartRefreshCounter++;
+    if (chartRefreshCounter >= 100) {
+      chartRefreshCounter = 0;
+      updateChartData();
+    }
+  }, 100);
+}
 
 (function checkSession() {
-  if (localStorage.getItem(LS_ADMIN_SESSION) === 'true') {
-    document.getElementById('login-screen').classList.add('hidden');
-    setTimeout(() => {
-      if (window.db) {
-        document.getElementById('admin-screen').classList.remove('hidden');
-        loadUsers();
-      }
-    }, 500);
+  const savedUser = localStorage.getItem(LS_SESSION_USER);
+  const savedTime = localStorage.getItem(LS_SESSION_TIME);
+  if (savedUser && savedTime && (Date.now() - parseInt(savedTime, 10)) < SESSION_MS) {
+    showMain(savedUser);
+  } else {
+    showLogin();
   }
 })();
-
-document.addEventListener('click', (e) => {
-  if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('active');
-});
 </script>
 </body>
 </html>
